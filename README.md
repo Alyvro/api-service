@@ -57,10 +57,8 @@ const app = express();
 const api = new ApiService({
   api_url: "https://your-backend.com/api",
   settings: {
-    telegram: {
-      token: "your_bot_token",
-      chat_id: "your_chat_id",
-    },
+    /* set TELEGRAM_TOKEN and TELEGRAM_CHAT_ID in your env file if you set telegram:true */
+    telegram: true,
   },
 });
 
@@ -75,17 +73,16 @@ When an error occurs, it will be automatically sent to your Telegram.
 
 ## ⚙️ Config Options
 
-| Key                        | Type                         | Required                | Description                                                    |
-| -------------------------- | ---------------------------- | ----------------------- | -------------------------------------------------------------- |
-| `api_url`                  | `string`                     | ✅                      | Base URL for sending HTTP requests                             |
-| `logger`                   | `boolean`                    | ❌                      | Enable request/response logging (for debugging)                |
-| `auth`                     | `AxiosBasicCredentials`      | ❌                      | HTTP Basic Auth credentials (`{ username, password }`)         |
-| `env`                      | `ConfigEnvType`              | ❌                      | API keys and environment secrets                               |
-| `env.PRIVATE_KEY`          | `string`                     | ✅ _(if used)_          | Your private key (can be used in secured requests)             |
-| `env.PUBLIC_KEY`           | `string`                     | ✅ _(if used)_          | Your public key (can be used in client-side logic)             |
-| `setting`                  | `Partial<ConfigSettingType>` | ❌                      | Additional settings for features like Telegram error reporting |
-| `setting.telegram.token`   | `string`                     | ✅ _(if Telegram used)_ | Telegram Bot Token used for error notifications                |
-| `setting.telegram.chat_id` | `string`                     | ✅ _(if Telegram used)_ | Telegram Chat/User ID where errors will be sent                |
+| Key                | Type                         | Required                | Description                                                    |
+| ------------------ | ---------------------------- | ----------------------- | -------------------------------------------------------------- |
+| `api_url`          | `string`                     | ✅                      | Base URL for sending HTTP requests                             |
+| `logger`           | `boolean`                    | ❌                      | Enable request/response logging (for debugging)                |
+| `auth`             | `AxiosBasicCredentials`      | ❌                      | HTTP Basic Auth credentials (`{ username, password }`)         |
+| `env`              | `ConfigEnvType`              | ❌                      | API keys and environment secrets                               |
+| `env.PRIVATE_KEY`  | `string`                     | ✅ _(if used)_          | Your private key (can be used in secured requests)             |
+| `env.PUBLIC_KEY`   | `string`                     | ✅ _(if used)_          | Your public key (can be used in client-side logic)             |
+| `setting`          | `Partial<ConfigSettingType>` | ❌                      | Additional settings for features like Telegram error reporting |
+| `setting.telegram` | `boolean`                    | ✅ _(if Telegram used)_ | Telegram Bot used for error notifications                      |
 
 ## 📫 Telegram Error Reporting
 
