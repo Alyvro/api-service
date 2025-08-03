@@ -1,0 +1,7 @@
+// tsconfig.build.json
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "incremental": false
+    }
+}

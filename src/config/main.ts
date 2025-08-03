@@ -1,0 +1,25 @@
+import api from "@/client/api";
+import middleware from "@/server/middleware";
+import { setConfigStorage } from "@/storage";
+import { ConfigType } from "@/types/config";
+
+export class ApiService {
+  private data: ConfigType;
+
+  constructor(obj: ConfigType) {
+    this.data = obj;
+    setConfigStorage(obj);
+  }
+
+  public client = (() => {
+    return {
+      request: api(this.data.api_url, this.data.auth, this.data.env),
+    };
+  })();
+
+  public server = (() => {
+    return {
+      middleware,
+    };
+  })();
+}

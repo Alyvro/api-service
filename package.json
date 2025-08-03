@@ -1,0 +1,50 @@
+{
+  "name": "@alyvro/api-service",
+  "version": "1.0.0",
+  "description": "Alyvro api service",
+  "types": "./dist/index.d.mts",
+  "main": "./dist/esm/index.js",
+  "module": "./dist/esm/index.js",
+  "files": [
+    "dist",
+    "README"
+  ],
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "types": "./dist/index.d.mts"
+    }
+  },
+  "scripts": {
+    "build": "pnpm remove-dist && tsup",
+    "remove-dist": "tsx scripts/remove-dist.ts",
+    "rel": "pnpm build && pnpm obs && pnpm publish"
+  },
+  "keywords": [
+    "api-service",
+    "api",
+    "alyvro-package",
+    "alyvro"
+  ],
+  "author": "alyvro",
+  "license": "MIT",
+  "repository": {
+    "url": ""
+  },
+  "packageManager": "pnpm@10.11.1",
+  "dependencies": {
+    "axios": "^1.11.0",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "tsup": "^8.5.0",
+    "zod": "^4.0.14"
+  },
+  "devDependencies": {
+    "@types/axios": "^0.14.4",
+    "@types/express": "^5.0.3",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^24.1.0",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3"
+  }
+}
