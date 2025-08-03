@@ -10,11 +10,17 @@ const { verify } = jwt;
 
 const sendTelegramMessage = async (
   config: ConfigSettingType["telegram"],
-  request_info: TelegramNetworkObjectType
+  request_info: TelegramNetworkObjectType,
+  logger?: boolean
 ) => {
-  const response = new TelegramNetwork(config.token, config.chat_id, {
-    ...request_info,
-  });
+  const response = new TelegramNetwork(
+    config.token,
+    config.chat_id,
+    {
+      ...request_info,
+    },
+    logger
+  );
 
   return await response.sendMessage();
 };
@@ -38,12 +44,16 @@ export default async function (
 
     if (!alyvroStatus) {
       if (config.setting?.telegram) {
-        await sendTelegramMessage(config.setting.telegram, {
-          message: "no access to this api",
-          method: req.method,
-          originalUrl: req.originalUrl,
-          status_code: "403",
-        });
+        await sendTelegramMessage(
+          config.setting.telegram,
+          {
+            message: "no access to this api",
+            method: req.method,
+            originalUrl: req.originalUrl,
+            status_code: "403",
+          },
+          config.logger
+        );
       }
 
       res.status(403).json({
@@ -60,12 +70,16 @@ export default async function (
 
     if (!alyvroKey || typeof alyvroKey !== "string") {
       if (config.setting?.telegram) {
-        await sendTelegramMessage(config.setting.telegram, {
-          message: "no access to this api",
-          method: req.method,
-          originalUrl: req.originalUrl,
-          status_code: "403",
-        });
+        await sendTelegramMessage(
+          config.setting.telegram,
+          {
+            message: "no access to this api",
+            method: req.method,
+            originalUrl: req.originalUrl,
+            status_code: "403",
+          },
+          config.logger
+        );
       }
 
       res.status(403).json({
@@ -93,12 +107,16 @@ export default async function (
     return next();
   } catch (error) {
     if (config.setting?.telegram) {
-      await sendTelegramMessage(config.setting.telegram, {
-        message: "no access to this api",
-        method: req.method,
-        originalUrl: req.originalUrl,
-        status_code: "403",
-      });
+      await sendTelegramMessage(
+        config.setting.telegram,
+        {
+          message: "no access to this api",
+          method: req.method,
+          originalUrl: req.originalUrl,
+          status_code: "403",
+        },
+        config.logger
+      );
     }
 
     res.status(403).json({
