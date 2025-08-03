@@ -11,15 +11,15 @@ export class ApiService {
     setConfigStorage(obj);
   }
 
-  public client = (() => {
+  public get client() {
     return {
       request: api(this.data.api_url, this.data.auth, this.data.env),
     };
-  })();
+  }
 
-  public server = (() => {
+  public get server() {
     return {
       middleware,
     };
-  })();
+  }
 }
