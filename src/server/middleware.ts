@@ -36,7 +36,22 @@ export default async function (
   try {
     const alyvroStatus = req.headers["x-alyvro-status"];
 
-    if (!alyvroStatus) return next();
+    if (!alyvroStatus) {
+      if (config.setting?.telegram) {
+        await sendTelegramMessage(config.setting.telegram, {
+          message: "no access to this api",
+          method: req.method,
+          originalUrl: req.originalUrl,
+          status_code: "403",
+        });
+      }
+
+      res.status(403).json({
+        message: "no access to this api",
+        status: 403,
+        powerd_by: "alyvro",
+      });
+    }
 
     const alyvroKey = req.headers["x-alyvro-api-key"];
     const alyvroBodyType = req.headers["x-alyvro-body-type"];
