@@ -1,6 +1,6 @@
 {
   "name": "@alyvro/api-service",
-  "version": "1.0.1",
+  "version": "1.0.11",
   "description": "Alyvro api service",
   "types": "./dist/index.d.mts",
   "main": "./dist/esm/index.js",
