@@ -9,10 +9,7 @@ export type ConfigSettingType = {
   /**
    * if error in server side, api-service send error message for your telegram bot
    */
-  telegram: {
-    token: string;
-    chat_id: string;
-  };
+  telegram: boolean;
 };
 
 export type ConfigType = {

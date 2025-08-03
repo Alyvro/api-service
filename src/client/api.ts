@@ -25,7 +25,7 @@ export default function (
       { expiresIn: "10min" }
     );
     config.headers["x-alyvro-body-type"] = secret?.body ? "sec" : "none";
-    config.headers["x-alyvro-status"] = config.status;
+    config.headers["x-alyvro-status"] = config.status ?? true;
 
     if (secret?.body) {
       if (config?.data) {

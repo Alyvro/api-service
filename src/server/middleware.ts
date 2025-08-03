@@ -9,13 +9,19 @@ import jwt from "jsonwebtoken";
 const { verify } = jwt;
 
 const sendTelegramMessage = async (
-  config: ConfigSettingType["telegram"],
   request_info: TelegramNetworkObjectType,
   logger?: boolean
 ) => {
+  const token = process.env.TELEGRAM_TOKEN;
+  const chat_id = process.env.TELEGRAM_CHAT_ID;
+
+  if (!token || !chat_id) {
+    throw new Error("Token or Chat ID is missing in TelegramNetwork");
+  }
+
   const response = new TelegramNetwork(
-    config.token,
-    config.chat_id,
+    token,
+    chat_id,
     {
       ...request_info,
     },
@@ -45,7 +51,6 @@ export default async function (
     if (!alyvroStatus) {
       if (config.setting?.telegram) {
         await sendTelegramMessage(
-          config.setting.telegram,
           {
             message: "no access to this api",
             method: req.method,
@@ -71,7 +76,6 @@ export default async function (
     if (!alyvroKey || typeof alyvroKey !== "string") {
       if (config.setting?.telegram) {
         await sendTelegramMessage(
-          config.setting.telegram,
           {
             message: "no access to this api",
             method: req.method,
@@ -108,7 +112,6 @@ export default async function (
   } catch (error) {
     if (config.setting?.telegram) {
       await sendTelegramMessage(
-        config.setting.telegram,
         {
           message: "no access to this api",
           method: req.method,

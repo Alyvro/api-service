@@ -8,3 +8,5 @@ declare module "axios" {
     status?: boolean;
   }
 }
+
+export {};
