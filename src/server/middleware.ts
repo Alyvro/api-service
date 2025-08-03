@@ -4,7 +4,9 @@ import type { ConfigSettingType } from "@/types/config";
 import type { TelegramNetworkObjectType } from "@/types/telegram";
 import Encrypt from "@/utils/enc";
 import type { NextFunction, Request, Response } from "express";
-import { verify } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
+
+const { verify } = jwt;
 
 const sendTelegramMessage = async (
   config: ConfigSettingType["telegram"],

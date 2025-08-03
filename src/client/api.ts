@@ -1,7 +1,9 @@
 import type { ConfigEnvType } from "@/types/config";
 import Encrypt from "@/utils/enc";
 import axios, { type AxiosBasicCredentials } from "axios";
-import { sign } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
+
+const { sign } = jwt;
 
 export default function (
   url: string,
