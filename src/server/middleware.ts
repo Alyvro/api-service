@@ -51,6 +51,8 @@ export default async function (
         status: 403,
         powerd_by: "alyvro",
       });
+
+      return;
     }
 
     const alyvroKey = req.headers["x-alyvro-api-key"];
