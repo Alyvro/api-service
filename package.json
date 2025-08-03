@@ -27,9 +27,13 @@
     "alyvro"
   ],
   "author": "alyvro",
-  "license": "MIT",
+  "license": "UNLICENSED",
   "repository": {
-    "url": ""
+    "url": "https://github.com/Alyvro/api-service"
+  },
+  "bugs": {
+    "url": "https://github.com/Alyvro/api-service/issues",
+    "email": "support@alyvro.com"
   },
   "packageManager": "pnpm@10.11.1",
   "dependencies": {

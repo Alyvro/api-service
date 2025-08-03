@@ -94,4 +94,10 @@ Just provide your bot token and chat ID in the config, and all server errors wil
 
 ## 📘 License
 
-MIT — free for personal and commercial use.
+© 2025 Alyvro. All rights reserved.
+
+This project is proprietary software.
+
+You **may fork** this repository **only for personal, educational, or contribution purposes**.
+
+Any other use, including copying, modifying, distributing, or commercial use **is prohibited without prior written permission** from the author.
