@@ -1,14 +1,17 @@
-import type { ConfigEnvType } from "@/types/config";
+import { serverCacheModule } from "@/modules/cache/server";
+import type { ApiTypes, ConfigEnvType } from "@/types/config";
 import Encrypt from "@/utils/enc";
 import axios, { type AxiosBasicCredentials } from "axios";
 import jwt from "jsonwebtoken";
+import { gunzipSync, gzipSync } from "zlib";
 
 const { sign } = jwt;
 
 export default function (
   url: string,
   auth?: AxiosBasicCredentials,
-  env?: ConfigEnvType
+  env?: ConfigEnvType,
+  api_types?: ApiTypes[]
 ) {
   const api = axios.create({
     baseURL: url,
@@ -27,13 +30,46 @@ export default function (
     config.headers["x-alyvro-body-type"] = secret?.body ? "sec" : "none";
     config.headers["x-alyvro-status"] = config.status ?? true;
 
-    if (secret?.body) {
-      if (config?.data) {
-        config.data = encryptSecureBlob(JSON.stringify(config.data));
-      }
+    if (config.plugins?.compressor && config?.data) {
+      const str = JSON.stringify(config.data);
+      config.data = gzipSync(str);
+      config.headers["Content-Encoding"] = "gzip";
+    }
+
+    if (secret?.body && config?.data) {
+      config.data = encryptSecureBlob(
+        typeof config.data === "string"
+          ? config.data
+          : JSON.stringify(config.data)
+      );
     }
 
     return config;
+  });
+
+  api.interceptors.response.use((res) => {
+    let data = res.data;
+
+    if (
+      res.headers["content-encoding"] === "gzip" &&
+      Buffer.isBuffer(res.data)
+    ) {
+      try {
+        data = JSON.parse(gunzipSync(res.data).toString("utf-8"));
+      } catch (error) {
+        console.error("Failed to decompress response", error);
+      }
+    }
+
+    const findApi = api_types?.find((item) => item.url === res.config.baseURL);
+    const parsed = findApi?.type.parse(data) ?? data;
+
+    if (res.config?.plugins?.cache) {
+      const key = res.config.url!;
+      return { ...res, data: serverCacheModule.set(key, parsed) };
+    }
+
+    return { ...res, data: parsed };
   });
 
   return api;

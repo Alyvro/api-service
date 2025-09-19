@@ -1,10 +1,10 @@
 import { TelegramNetwork } from "@/network/telegram";
 import { getConfigStorage } from "@/storage";
-import type { ConfigSettingType } from "@/types/config";
 import type { TelegramNetworkObjectType } from "@/types/telegram";
 import Encrypt from "@/utils/enc";
 import type { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
+import { gunzipSync, gzipSync } from "zlib";
 
 const { verify } = jwt;
 
@@ -34,7 +34,10 @@ const sendTelegramMessage = async (
 export default async function (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
+  settings: Partial<{
+    cache: boolean;
+  }>
 ) {
   const config = getConfigStorage();
 
@@ -98,6 +101,19 @@ export default async function (
 
     verify(alyvroKey, privateKey);
 
+    let bodyData = req.body;
+
+    if (
+      req.headers["content-encoding"] === "gzip" &&
+      Buffer.isBuffer(bodyData)
+    ) {
+      try {
+        bodyData = gunzipSync(bodyData).toString("utf-8");
+      } catch (err) {
+        console.error("Failed to decompress gzip body:", err);
+      }
+    }
+
     if (alyvroBodyType === "sec") {
       let decode = decryptSecureBlob(req.body);
 
@@ -106,7 +122,28 @@ export default async function (
       } catch (error) {}
 
       req.body = decode;
+    } else {
+      req.body = bodyData;
     }
+
+    const originalJson = res.json.bind(res);
+    res.json = (data) => {
+      if (req.headers["accept-encoding"]?.includes("gzip")) {
+        try {
+          const compressed = gzipSync(
+            Buffer.from(JSON.stringify(data), "utf-8")
+          );
+          res.setHeader("Content-Encoding", "gzip");
+          res.setHeader("Content-Type", "application/json");
+          res.send(compressed);
+          return res;
+        } catch (error) {
+          console.error("Failed to compress response:", error);
+        }
+
+        return originalJson();
+      }
+    };
 
     return next();
   } catch (error) {

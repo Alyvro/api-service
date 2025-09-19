@@ -1,6 +1,6 @@
 {
   "name": "@alyvro/api-service",
-  "version": "1.0.16",
+  "version": "1.0.17",
   "description": "Alyvro api service",
   "types": "./dist/index.d.mts",
   "main": "./dist/esm/index.js",
@@ -18,7 +18,7 @@
   "scripts": {
     "build": "pnpm remove-dist && tsup",
     "remove-dist": "tsx scripts/remove-dist.ts",
-    "rel": "pnpm build && pnpm obs && pnpm publish"
+    "rel": "pnpm build && pnpm publish"
   },
   "keywords": [
     "api-service",
@@ -27,7 +27,7 @@
     "alyvro"
   ],
   "author": "alyvro",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "repository": {
     "url": "https://github.com/Alyvro/api-service"
   },
@@ -41,6 +41,7 @@
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "tsup": "^8.5.0",
+    "zlib": "^1.0.5",
     "zod": "^4.0.14"
   },
   "devDependencies": {

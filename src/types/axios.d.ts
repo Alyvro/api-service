@@ -6,6 +6,10 @@ declare module "axios" {
       body: boolean;
     }>;
     status?: boolean;
+    plugins?: Partial<{
+      cache: boolean;
+      compressor: boolean;
+    }>;
   }
 }
 

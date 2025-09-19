@@ -1,4 +1,5 @@
 import api from "@/client/api";
+import { serverCacheModule } from "@/modules/cache/server";
 import middleware from "@/server/middleware";
 import { setConfigStorage } from "@/storage";
 import { ConfigType } from "@/types/config";
@@ -20,6 +21,14 @@ export class ApiService {
   public get server() {
     return {
       middleware,
+    };
+  }
+
+  static get modules() {
+    return {
+      cache: {
+        server: serverCacheModule,
+      },
     };
   }
 }
