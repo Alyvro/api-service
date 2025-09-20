@@ -1,5 +1,4 @@
 import type { AxiosBasicCredentials } from "axios";
-import { ZodTypeAny } from "zod";
 
 export type ConfigEnvType = {
   PRIVATE_KEY: string;
@@ -13,19 +12,10 @@ export type ConfigSettingType = {
   telegram: boolean;
 };
 
-export type ApiTypes<
-  T extends string = string,
-  Z extends ZodTypeAny = ZodTypeAny
-> = {
-  url: T;
-  type: Z;
-};
-
 export type ConfigType = {
   api_url: string;
   logger?: boolean;
   auth?: AxiosBasicCredentials;
   env?: ConfigEnvType;
-  api_types?: ApiTypes[];
   setting?: Partial<ConfigSettingType>;
 };

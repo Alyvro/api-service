@@ -1,5 +1,5 @@
 import { retry } from "@/plugins/retry";
-import type { ApiTypes, ConfigEnvType } from "@/types/config";
+import type { ConfigEnvType } from "@/types/config";
 import Encrypt from "@/utils/enc";
 import axios, { type AxiosError, type AxiosBasicCredentials } from "axios";
 import jwt from "jsonwebtoken";
@@ -10,8 +10,7 @@ const { sign } = jwt;
 export default function (
   url: string,
   auth?: AxiosBasicCredentials,
-  env?: ConfigEnvType,
-  api_types?: ApiTypes[]
+  env?: ConfigEnvType
 ) {
   const api = axios.create({
     baseURL: url,
@@ -61,8 +60,7 @@ export default function (
       }
     }
 
-    const findApi = api_types?.find((item) => item.url === res.config.baseURL);
-    const parsed = findApi?.type.parse(data) ?? data;
+    const parsed = data;
 
     if (res.config?.plugins?.cache) {
       const key = res.config.url!;
