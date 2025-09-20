@@ -1,6 +1,6 @@
 {
   "name": "@alyvro/api-service",
-  "version": "1.0.21",
+  "version": "1.0.22",
   "description": "A minimal yet powerful service for sending HTTP requests on the client and handling them gracefully on the server. No complicated setup. Just plug in your keys — and you're ready to go.",
   "types": "./dist/index.d.mts",
   "main": "./dist/esm/index.js",
