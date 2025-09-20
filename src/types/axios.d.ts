@@ -1,5 +1,6 @@
 import "axios";
 import { ReturnFunction } from "./cache";
+import { RetryOptions } from "./retry";
 
 declare module "axios" {
   export interface AxiosRequestConfig {
@@ -10,6 +11,7 @@ declare module "axios" {
     plugins?: Partial<{
       cache: ReturnFunction;
       compressor: boolean;
+      retry: Partial<RetryOptions>;
     }>;
   }
 }

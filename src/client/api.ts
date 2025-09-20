@@ -1,6 +1,7 @@
+import { retry } from "@/plugins/retry";
 import type { ApiTypes, ConfigEnvType } from "@/types/config";
 import Encrypt from "@/utils/enc";
-import axios, { type AxiosBasicCredentials } from "axios";
+import axios, { type AxiosError, type AxiosBasicCredentials } from "axios";
 import jwt from "jsonwebtoken";
 import { gunzipSync, gzipSync } from "zlib";
 
@@ -70,6 +71,8 @@ export default function (
 
     return { ...res, data: parsed };
   });
+
+  retry(api);
 
   return api;
 }

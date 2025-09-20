@@ -13,9 +13,12 @@ export type ConfigSettingType = {
   telegram: boolean;
 };
 
-export type ApiTypes<T extends ZodTypeAny = ZodTypeAny> = {
-  url: string;
-  type: T;
+export type ApiTypes<
+  T extends string = string,
+  Z extends ZodTypeAny = ZodTypeAny
+> = {
+  url: T;
+  type: Z;
 };
 
 export type ConfigType = {

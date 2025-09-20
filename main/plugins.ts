@@ -1,3 +1,3 @@
-export { serverCachePlugin as cache } from "@/plugins/cache/server";
+export * from "@/plugins";
 
 export type * from "@/types/cache";

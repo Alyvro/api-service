@@ -8,7 +8,7 @@
 - ✅ Express middleware support — add it once and manage everything centrally
 - ✅ Auto error reporting to Telegram — just provide your bot token & chat ID
 - ✅ Fully configurable via a simple object
-- ✅ Plugin system for extra features (Cache, Compressor, …)
+- ✅ Plugin system for extra features (Cache, Compressor, Retry, Cancel, …)
 - ✅ Lightweight, fast, and production-ready
 
 ### 📦 Installation
@@ -28,30 +28,36 @@ yarn add @alyvro/api-service
 ### ➤ Client-side
 
 ```ts
-import { ApiService } from "@alyvro/api-service";
+import { ApiService, createAbortController } from "@alyvro/api-service";
 import { cache } from "@alyvro/api-service/plugins";
 
-const api = new ApiService({
-  api_url: "https://your-backend.com/api",
-});
+const api = new ApiService({ api_url: "https://your-backend.com/api" });
 
-api.client.request.post(
+// Example: Request with cache, compressor, and retry
+const controller = createAbortController();
+
+const response = await api.client.request.post(
   "/user",
   { index: "foo" },
   {
-    secret: {
-      body: true,
-    },
+    secret: { body: true },
+    signal: controller.signal,
     plugins: {
       cache,
       compressor: true,
+      retry: { retries: 5, retryDelay: 500, backoff: true },
     },
   }
 );
+
+// Cancel request if needed
+controller.abort();
 ```
 
 - `cache` → stores and reuses previous responses to reduce duplicate requests (client & server safe)
 - `compressor` → automatically compresses/decompresses payloads when supported by the server
+- `retry` → automatic per-request retry with configurable attempts, delay, and backoff
+- `createAbortController` → allows canceling requests on demand
 
 ---
 
@@ -65,16 +71,13 @@ const app = express();
 
 const api = new ApiService({
   api_url: "https://your-backend.com/api",
-  settings: {
-    /* set TELEGRAM_TOKEN and TELEGRAM_CHAT_ID in your env file if you set telegram:true */
-    telegram: true,
-  },
+  settings: { telegram: true }, // enables Telegram error reporting
 });
 
-// middleware with plugins
+// Middleware with skip_routers option
 app.use((req, res, next) =>
   api.server.middleware(req, res, next, {
-    cache: true, // enables server-side response caching
+    skip_routers: ["/health", "/status"],
   })
 );
 
@@ -83,7 +86,9 @@ app.get("/", (req, res) => {
 });
 ```
 
-When an error occurs, it will be automatically sent to your Telegram.
+Middleware now supports skipping routes via `skip_routers`. Requests matching any path in this array will bypass the middleware.
+
+All server errors will automatically be sent to your Telegram bot.
 
 ---
 
@@ -104,26 +109,38 @@ When an error occurs, it will be automatically sent to your Telegram.
 
 ## 🧩 Plugins
 
-The new **Plugin System** allows extending the functionality of requests and middleware.
+Plugins allow extending the functionality of requests and middleware. They are configured **per-request**.
 
 ### Built-in Plugins
 
-- **Cache**  
+- **Cache**
   Stores last response and prevents duplicate requests with identical payloads.
 
-  - Client: prevents duplicate `POST/GET` calls
-  - Server: can be enabled via `cache: true` in `middleware`
-
 - **Compressor**
-  - Client: sends requests in compressed form if supported
-  - Server: automatically decompresses incoming gzip payloads and compresses JSON responses when the client supports gzip
+  Compresses request payloads and automatically decompresses gzip responses.
+
+- **Retry**
+  Automatically retries failed requests.
+
+  ```ts
+  plugins: { retry: { retries: 5, retryDelay: 500, backoff: true } }
+  ```
+
+- **Cancel**
+  Allows canceling requests using `AbortController`.
+
+  ```ts
+  import { createAbortController } from "@alyvro/api-service";
+  const controller = createAbortController();
+  api.get("/users", { signal: controller.signal });
+  controller.abort();
+  ```
 
 ---
 
 ## 📫 Telegram Error Reporting
 
-One of the standout features of this package is automated Telegram error reporting.  
-Just provide your bot token and chat ID in the config, and all server errors will be pushed directly to your DM (or group).
+Errors can be automatically sent to Telegram. Just provide your bot token and chat ID in the config.
 
 ---
 
