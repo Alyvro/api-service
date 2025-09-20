@@ -1,8 +1,10 @@
+import type { MiddlewareOptions } from "@/types/middleware";
+import type { TelegramNetworkObjectType } from "@/types/telegram";
+import type { NextFunction, Request, Response } from "express";
+
 import { TelegramNetwork } from "@/network/telegram";
 import { getConfigStorage } from "@/storage";
-import type { TelegramNetworkObjectType } from "@/types/telegram";
 import Encrypt from "@/utils/enc";
-import type { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { gunzipSync, gzipSync } from "zlib";
 
@@ -35,10 +37,15 @@ export default async function (
   req: Request,
   res: Response,
   next: NextFunction,
-  settings: Partial<{
-    cache: boolean;
-  }>
+  options?: Partial<MiddlewareOptions>
 ) {
+  if (
+    options?.skip_routers?.length &&
+    options.skip_routers.includes(req.path)
+  ) {
+    return next();
+  }
+
   const config = getConfigStorage();
 
   if (!config) throw new Error("Config no install");

@@ -1,6 +1,6 @@
 {
   "name": "@alyvro/api-service",
-  "version": "1.0.17",
+  "version": "1.0.18",
   "description": "Alyvro api service",
   "types": "./dist/index.d.mts",
   "main": "./dist/esm/index.js",
@@ -13,6 +13,10 @@
     ".": {
       "import": "./dist/esm/index.js",
       "types": "./dist/index.d.mts"
+    },
+    "./plugins": {
+      "import": "./dist/esm/plugins.js",
+      "types": "./dist/plugins.d.mts"
     }
   },
   "scripts": {

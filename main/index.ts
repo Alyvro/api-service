@@ -4,4 +4,4 @@ import { ConfigEnvType, ConfigType, ConfigSettingType } from "@/types/config";
 
 export default ApiService;
 
-export { ConfigEnvType, ConfigType, ConfigSettingType };
+export type { ConfigEnvType, ConfigType, ConfigSettingType };

@@ -1,4 +1,5 @@
 import "axios";
+import { ReturnFunction } from "./cache";
 
 declare module "axios" {
   export interface AxiosRequestConfig {
@@ -7,7 +8,7 @@ declare module "axios" {
     }>;
     status?: boolean;
     plugins?: Partial<{
-      cache: boolean;
+      cache: ReturnFunction;
       compressor: boolean;
     }>;
   }

@@ -1,11 +1,8 @@
-type CacheEntry<T> = {
-  data: T;
-  timestamp: number;
-};
+import type { CacheEntry, ReturnFunction } from "@/types/cache";
 
-const serverCache = new Map<string, CacheEntry<any>>();
+export const serverCache = new Map<string, CacheEntry<any>>();
 
-export const serverCacheModule = {
+export const serverCachePlugin: ReturnFunction = {
   get: <T>(key: string): T | undefined => serverCache.get(key)?.data,
 
   set: <T>(key: string, data: T): T => {

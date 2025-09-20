@@ -1,4 +1,3 @@
-import { serverCacheModule } from "@/modules/cache/server";
 import type { ApiTypes, ConfigEnvType } from "@/types/config";
 import Encrypt from "@/utils/enc";
 import axios, { type AxiosBasicCredentials } from "axios";
@@ -66,7 +65,7 @@ export default function (
 
     if (res.config?.plugins?.cache) {
       const key = res.config.url!;
-      return { ...res, data: serverCacheModule.set(key, parsed) };
+      return { ...res, data: res.config.plugins.cache.set(key, parsed) };
     }
 
     return { ...res, data: parsed };
