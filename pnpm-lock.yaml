@@ -23,9 +23,6 @@ importers:
       zlib:
         specifier: ^1.0.5
         version: 1.0.5
-      zod:
-        specifier: ^4.0.14
-        version: 4.0.14
     devDependencies:
       '@types/axios':
         specifier: ^0.14.4
@@ -1066,9 +1063,6 @@ packages:
     resolution: {integrity: sha512-40fpE2II+Cd3k8HWTWONfeKE2jL+P42iWJ1zzps5W51qcTsOUKM5Q5m2PFb0CLxlmFAaUuUdJGc3OfZy947v0w==}
     engines: {node: '>=0.2.0'}
 
-  zod@4.0.14:
-    resolution: {integrity: sha512-nGFJTnJN6cM2v9kXL+SOBq3AtjQby3Mv5ySGFof5UGRHrRioSJ5iG680cYNjE/yWk671nROcpPj4hAS8nyLhSw==}
-
 snapshots:
 
   '@esbuild/aix-ppc64@0.25.8':
@@ -2038,5 +2032,3 @@ snapshots:
   wrappy@1.0.2: {}
 
   zlib@1.0.5: {}
-
-  zod@4.0.14: {}

@@ -12,11 +12,18 @@
   "exports": {
     ".": {
       "import": "./dist/esm/index.js",
-      "types": "./dist/index.d.mts"
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
     },
     "./plugins": {
       "import": "./dist/esm/plugins.js",
-      "types": "./dist/plugins.d.mts"
+      "require": "./dist/plugins.js",
+      "types": "./dist/plugins.d.ts"
+    },
+    "./types": {
+      "import": "./dist/esm/types.js",
+      "require": "./dist/types.js",
+      "types": "./dist/types.d.ts"
     }
   },
   "scripts": {
@@ -45,8 +52,7 @@
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "tsup": "^8.5.0",
-    "zlib": "^1.0.5",
-    "zod": "^4.0.14"
+    "zlib": "^1.0.5"
   },
   "devDependencies": {
     "@types/axios": "^0.14.4",
