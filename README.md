@@ -29,7 +29,7 @@ yarn add @alyvro/api-service
 
 ```ts
 import { ApiService } from "@alyvro/api-service";
-import { cache, compressor } from "@alyvro/api-service/plugins";
+import { cache } from "@alyvro/api-service/plugins";
 
 const api = new ApiService({
   api_url: "https://your-backend.com/api",
@@ -44,7 +44,7 @@ api.client.request.post(
     },
     plugins: {
       cache,
-      compressor,
+      compressor: true,
     },
   }
 );
