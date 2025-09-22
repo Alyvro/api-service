@@ -1,20 +1,43 @@
 import api from "@/client/api";
+import fetcher from "@/client/fetcher";
 import { serverCachePlugin } from "@/plugins/cache/server";
 import middleware from "@/server/middleware";
 import { setConfigStorage } from "@/storage";
-import { ConfigType } from "@/types/config";
+import { ApiServiceType } from "@/types/api-service";
+import type { ConfigType } from "@/types/config";
 
-export class ApiService {
-  private data: ConfigType;
-
+export class ApiService extends ApiServiceType {
   constructor(obj: ConfigType) {
-    this.data = obj;
-    setConfigStorage(obj);
+    super(obj);
+
+    const privateKey = obj.env?.PRIVATE_KEY ?? process.env.PRIVATE_KEY;
+    const publicKey = obj.env?.PUBLIC_KEY ?? process.env.PUBLIC_KEY;
+
+    if (!privateKey || !publicKey) {
+      throw new Error(
+        `Error to get ${
+          privateKey ? "PRIVATE_KEY" : "PUBLIC_KEY"
+        }\nplease set on .env config or in ApiService options`
+      );
+    }
+
+    setConfigStorage({
+      ...obj,
+      env: {
+        PRIVATE_KEY: privateKey,
+        PUBLIC_KEY: publicKey,
+      },
+    });
   }
 
   public get client() {
     return {
-      request: api(this.data.api_url, this.data.auth, this.data.env),
+      axios: {
+        request: api(this.data.url, this.data.auth, this.data.env),
+      },
+      fetch: {
+        request: fetcher,
+      },
     };
   }
 

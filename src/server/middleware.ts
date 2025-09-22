@@ -7,6 +7,7 @@ import { getConfigStorage } from "@/storage";
 import Encrypt from "@/utils/enc";
 import jwt from "jsonwebtoken";
 import { gunzipSync, gzipSync } from "zlib";
+import { ConfigType } from "main/types";
 
 const { verify } = jwt;
 
@@ -33,7 +34,34 @@ const sendTelegramMessage = async (
   return await response.sendMessage();
 };
 
-export default async function (
+const sendErrorMessage = async (
+  req: Request,
+  res: Response,
+  config: ConfigType,
+  options?: Partial<MiddlewareOptions>
+) => {
+  const powerd_by = options?.powerd_by ?? "alyvro/api-service";
+
+  if (config.setting?.telegram) {
+    await sendTelegramMessage(
+      {
+        message: "no access to this api",
+        method: req.method,
+        originalUrl: req.originalUrl,
+        status_code: "403",
+      },
+      config.logger
+    );
+  }
+
+  res.status(403).json({
+    message: "no access to this api",
+    status: 403,
+    powerd_by,
+  });
+};
+
+export default async function middleware(
   req: Request,
   res: Response,
   next: NextFunction,
@@ -59,23 +87,7 @@ export default async function (
     const alyvroStatus = req.headers["x-alyvro-status"];
 
     if (!alyvroStatus) {
-      if (config.setting?.telegram) {
-        await sendTelegramMessage(
-          {
-            message: "no access to this api",
-            method: req.method,
-            originalUrl: req.originalUrl,
-            status_code: "403",
-          },
-          config.logger
-        );
-      }
-
-      res.status(403).json({
-        message: "no access to this api",
-        status: 403,
-        powerd_by: "alyvro",
-      });
+      sendErrorMessage(req, res, config, options);
 
       return;
     }
@@ -84,23 +96,7 @@ export default async function (
     const alyvroBodyType = req.headers["x-alyvro-body-type"];
 
     if (!alyvroKey || typeof alyvroKey !== "string") {
-      if (config.setting?.telegram) {
-        await sendTelegramMessage(
-          {
-            message: "no access to this api",
-            method: req.method,
-            originalUrl: req.originalUrl,
-            status_code: "403",
-          },
-          config.logger
-        );
-      }
-
-      res.status(403).json({
-        message: "no access to this api",
-        status: 403,
-        powerd_by: "alyvro",
-      });
+      sendErrorMessage(req, res, config, options);
       return;
     }
 
@@ -153,24 +149,8 @@ export default async function (
     };
 
     return next();
-  } catch (error) {
-    if (config.setting?.telegram) {
-      await sendTelegramMessage(
-        {
-          message: "no access to this api",
-          method: req.method,
-          originalUrl: req.originalUrl,
-          status_code: "403",
-        },
-        config.logger
-      );
-    }
-
-    res.status(403).json({
-      message: "no access to this api",
-      status: 403,
-      powerd_by: "alyvro",
-    });
+  } catch {
+    sendErrorMessage(req, res, config, options);
     return;
   }
 }

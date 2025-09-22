@@ -1,9 +1,9 @@
 {
   "name": "@alyvro/api-service",
-  "version": "1.0.22",
+  "version": "1.0.3",
   "description": "A minimal yet powerful service for sending HTTP requests on the client and handling them gracefully on the server. No complicated setup. Just plug in your keys — and you're ready to go.",
-  "types": "./dist/index.d.mts",
-  "main": "./dist/esm/index.js",
+  "types": "./dist/index.d.ts",
+  "main": "./dist/index.js",
   "module": "./dist/esm/index.js",
   "files": [
     "dist",
@@ -12,18 +12,17 @@
   "exports": {
     ".": {
       "import": "./dist/esm/index.js",
-      "require": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/index.js"
     },
     "./plugins": {
+      "types": "./dist/plugins.d.ts",
       "import": "./dist/esm/plugins.js",
-      "require": "./dist/plugins.js",
-      "types": "./dist/plugins.d.ts"
+      "require": "./dist/plugins.js"
     },
     "./types": {
+      "types": "./dist/types.d.ts",
       "import": "./dist/esm/types.js",
-      "require": "./dist/types.js",
-      "types": "./dist/types.d.ts"
+      "require": "./dist/types.js"
     }
   },
   "scripts": {

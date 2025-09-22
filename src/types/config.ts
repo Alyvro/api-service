@@ -13,7 +13,7 @@ export type ConfigSettingType = {
 };
 
 export type ConfigType = {
-  api_url: string;
+  url: string;
   logger?: boolean;
   auth?: AxiosBasicCredentials;
   env?: ConfigEnvType;

@@ -1,12 +1,13 @@
 # ⚡ @alyvro/api-service
 
-[![Socket Badge](https://badge.socket.dev/npm/package/@alyvro/api-service/1.0.20)](https://socket.dev/npm/package/@alyvro/api-service/overview)
+[![Socket Badge](https://badge.socket.dev/npm/package/@alyvro/api-service/1.0.20)](https://badge.socket.dev/npm/package/@alyvro/api-service/overview)
 
 **A minimal yet powerful service for sending HTTP requests on the client and handling them gracefully on the server. No complicated setup. Just plug in your keys — and you're ready to go.**
 
 ### 🚀 Features
 
 - ✅ Effortless HTTP requests on the client — built on top of Axios
+- ✅ Built-in fetch support for client-side requests
 - ✅ Express middleware support — add it once and manage everything centrally
 - ✅ Auto error reporting to Telegram — just provide your bot token & chat ID
 - ✅ Fully configurable via a simple object
@@ -30,27 +31,35 @@ yarn add @alyvro/api-service
 ### ➤ Client-side
 
 ```ts
-import { ApiService, createAbortController } from "@alyvro/api-service";
-import { cache } from "@alyvro/api-service/plugins";
+import { ApiService } from "@alyvro/api-service";
+import { cache, createAbortController } from "@alyvro/api-service/plugins";
 
-const api = new ApiService({ api_url: "https://your-backend.com/api" });
+const api = new ApiService({ api_url: "https://api.alyvro.com" });
 
 // Example: Request with cache, compressor, and retry
 const controller = createAbortController();
 
-const response = await api.client.request.post(
+// Using Axios
+const axiosResponse = await api.client.axios.request.post(
   "/user",
   { index: "foo" },
   {
     secret: { body: true },
     signal: controller.signal,
     plugins: {
-      cache,
+      // cache:cache or ApiService.plugins.cache,
       compressor: true,
       retry: { retries: 5, retryDelay: 500, backoff: true },
     },
   }
 );
+
+// Using fetch
+const fetchResponse = await api.client.fetch.request("/user", {
+  method: "POST",
+  body: { index: "foo" },
+  signal: controller.signal,
+});
 
 // Cancel request if needed
 controller.abort();
@@ -60,6 +69,7 @@ controller.abort();
 - `compressor` → automatically compresses/decompresses payloads when supported by the server
 - `retry` → automatic per-request retry with configurable attempts, delay, and backoff
 - `createAbortController` → allows canceling requests on demand
+- ⚠️ **Note:** Plugins currently only work with Axios. Fetch does **not** support Axios plugins yet.
 
 ---
 
@@ -72,7 +82,7 @@ import { ApiService } from "@alyvro/api-service";
 const app = express();
 
 const api = new ApiService({
-  api_url: "https://your-backend.com/api",
+  url: "https://alyvro.com",
   settings: { telegram: true }, // enables Telegram error reporting
 });
 
@@ -98,7 +108,7 @@ All server errors will automatically be sent to your Telegram bot.
 
 | Key                | Type                         | Required                | Description                                                    |
 | ------------------ | ---------------------------- | ----------------------- | -------------------------------------------------------------- |
-| `api_url`          | `string`                     | ✅                      | Base URL for sending HTTP requests                             |
+| `url`              | `string`                     | ✅                      | Base URL for sending HTTP requests                             |
 | `logger`           | `boolean`                    | ❌                      | Enable request/response logging (for debugging)                |
 | `auth`             | `AxiosBasicCredentials`      | ❌                      | HTTP Basic Auth credentials (`{ username, password }`)         |
 | `env`              | `ConfigEnvType`              | ❌                      | API keys and environment secrets                               |
@@ -132,11 +142,13 @@ Plugins allow extending the functionality of requests and middleware. They are c
   Allows canceling requests using `AbortController`.
 
   ```ts
-  import { createAbortController } from "@alyvro/api-service";
+  import { createAbortController } from "@alyvro/api-service/plugins";
   const controller = createAbortController();
   api.get("/users", { signal: controller.signal });
   controller.abort();
   ```
+
+> ⚠️ **Note:** Plugins currently only work with Axios. Fetch does **not** support Axios plugins yet.
 
 ---
 
