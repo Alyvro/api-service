@@ -31,7 +31,8 @@
     "rel": "pnpm build && pnpm publish",
     "test": "vitest --run",
     "coverage": "vitest run --coverage",
-    "release": "release-it"
+    "release": "release-it",
+    "changelog": "release-it --only-changelog"
   },
   "keywords": [
     "api-service",
