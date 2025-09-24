@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.0.5](https://github.com/Alyvro/api-service/compare/v1.0.4...v1.0.5) (2025-09-24)
+
+### Bug Fixes
+
+* ci ([b63caa3](https://github.com/Alyvro/api-service/commit/b63caa3f63d5f00c16e351929823e05f7cce3814))
+* ci ([48def84](https://github.com/Alyvro/api-service/commit/48def84520bc00cba85ae4c3a40c4ee61d179bb5))
+* ci ([2b0ff6c](https://github.com/Alyvro/api-service/commit/2b0ff6c4318547ec23ab824e8f72f929e5bb76d0))
+* ci ([891a9d5](https://github.com/Alyvro/api-service/commit/891a9d5629a8f74c7ba894f6896745fedcffc4fc))
+* ci ([4f739d3](https://github.com/Alyvro/api-service/commit/4f739d372d2d3932f985bae828879b6b271cd541))
+* version ([e549af7](https://github.com/Alyvro/api-service/commit/e549af7681c93efa3c69cf780d9e7b7cb7027412))
+
 ## 1.0.4 (2025-09-24)
 
 ### Bug Fixes
