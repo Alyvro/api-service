@@ -43,7 +43,7 @@
   "author": "alyvro",
   "license": "MIT",
   "repository": {
-    "url": "https://github.com/Alyvro/api-service"
+    "url": "git+https://github.com/Alyvro/api-service.git"
   },
   "bugs": {
     "url": "https://github.com/Alyvro/api-service/issues",
