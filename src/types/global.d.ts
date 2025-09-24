@@ -1,3 +1,6 @@
+import type { ReturnFunction } from "./cache";
+import type { RetryOptions } from "./retry";
+
 export {};
 
 declare global {

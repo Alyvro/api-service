@@ -28,7 +28,10 @@
   "scripts": {
     "build": "pnpm remove-dist && tsup",
     "remove-dist": "tsx scripts/remove-dist.ts",
-    "rel": "pnpm build && pnpm publish"
+    "rel": "pnpm build && pnpm publish",
+    "test": "vitest --run",
+    "coverage": "vitest run --coverage",
+    "release": "release-it"
   },
   "keywords": [
     "api-service",
@@ -54,11 +57,18 @@
     "zlib": "^1.0.5"
   },
   "devDependencies": {
+    "@release-it/conventional-changelog": "^10.0.1",
     "@types/axios": "^0.14.4",
     "@types/express": "^5.0.3",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^24.1.0",
+    "@vitest/coverage-v8": "^3.2.4",
+    "msw": "^2.11.3",
+    "release-it": "^19.0.5",
     "tsx": "^4.20.3",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^3.2.4",
+    "whatwg-fetch": "^3.6.20"
   }
 }

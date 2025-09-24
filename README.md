@@ -1,6 +1,8 @@
 # ⚡ @alyvro/api-service
 
-[![Socket Badge](https://badge.socket.dev/npm/package/@alyvro/api-service/1.0.20)](https://badge.socket.dev/npm/package/@alyvro/api-service/overview)
+[![Socket Badge](https://badge.socket.dev/npm/package/@alyvro/api-service/1.0.3)](https://socket.dev/npm/package/@alyvro/api-service/overview)
+![CI](https://github.com/Alyvro/api-service/actions/workflows/ci.yml/badge.svg)
+![npm](https://img.shields.io/npm/v/@alyvro/api-service)
 
 **A minimal yet powerful service for sending HTTP requests on the client and handling them gracefully on the server. No complicated setup. Just plug in your keys — and you're ready to go.**
 
