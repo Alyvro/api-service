@@ -1,6 +1,6 @@
 import api from "@/client/api";
 import fetcher from "@/client/fetcher";
-import { serverCachePlugin } from "@/plugins/cache/server";
+import { serverCache, serverCachePlugin } from "@/plugins/cache/server";
 import middleware from "@/server/middleware";
 import { setConfigStorage } from "@/storage";
 import { ApiServiceType } from "@/types/api-service";
@@ -51,6 +51,14 @@ export class ApiService extends ApiServiceType {
     return {
       cache: {
         server: serverCachePlugin,
+      },
+    };
+  }
+
+  static get storages() {
+    return {
+      server: {
+        cache: serverCache,
       },
     };
   }
