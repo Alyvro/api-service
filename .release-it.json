@@ -22,6 +22,6 @@
   },
   "hooks": {
     "before:init": "pnpm test",
-    "after:bump": "git add CHANGELOG.md && git commit -m 'docs: update changelog for v${version}'"
+    "after:bump": "sh -c 'git add CHANGELOG.md && git commit -m \"docs: update changelog for v${version}\"'"
   }
 }
