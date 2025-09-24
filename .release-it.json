@@ -17,11 +17,12 @@
   "plugins": {
     "@release-it/conventional-changelog": {
       "preset": "conventionalcommits",
-      "infile": "CHANGELOG.md"
+      "infile": "CHANGELOG.md",
+      "header": "# Changelog"
     }
   },
   "hooks": {
     "before:init": "pnpm test",
-    "after:bump": "pnpm changelog && git add CHANGELOG.md && git commit -m \"docs: update changelog for v${version}\""
+    "after:bump": "git add CHANGELOG.md && git commit -m \"docs: update changelog for v${version}\""
   }
 }
