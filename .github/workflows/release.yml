@@ -41,6 +41,11 @@ jobs:
       - name: Run tests
         run: pnpm test
 
+      - name: Set git identity
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
       - name: Release
         run: pnpm release --ci
         env:
