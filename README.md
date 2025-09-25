@@ -160,6 +160,20 @@ Errors can be automatically sent to Telegram. Just provide your bot token and ch
 
 ---
 
+## 💜 Support & Donate
+
+If you like this project, consider supporting via crypto:
+
+- **USDT (TRC20)**: `TFqgU6Fa9ysHBRPzZT6FboX9DZ96gcCPR5`
+- **Toncoin (TON)**: `UQDhIG21wTkqa9Z7tEAqsasiTN5kcAE7-ZNLHuaUw_9W4AW5`
+- **TRON (TRX)**: `TFqgU6Fa9ysHBRPzZT6FboX9DZ96gcCPR5`
+
+[![Donate USDT](<https://img.shields.io/badge/Donate-USDT%20(TRC20)-orange>)](usdt-trc20:TFqgU6Fa9ysHBRPzZT6FboX9DZ96gcCPR5)
+[![Donate TON](https://img.shields.io/badge/Donate-TON-blue)](ton:UQDhIG21wTkqa9Z7tEAqsasiTN5kcAE7-ZNLHuaUw_9W4AW5)
+[![Donate TRON](https://img.shields.io/badge/Donate-TRON-red)](trx:TFqgU6Fa9ysHBRPzZT6FboX9DZ96gcCPR5)
+
+---
+
 ## 📘 License
 
 MIT License
