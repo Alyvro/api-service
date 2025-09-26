@@ -1,5 +1,7 @@
 # Changelog
 
+## [1.0.7](https://github.com/Alyvro/api-service/compare/v1.0.6...v1.0.7) (2025-09-26)
+
 ## [1.0.6](https://github.com/Alyvro/api-service/compare/v1.0.4...v1.0.6) (2025-09-24)
 
 ### Bug Fixes
