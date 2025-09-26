@@ -13,30 +13,34 @@ export type ConfigSettingType = {
   telegram: boolean;
 };
 
+export type ConfigMiddlewareHeadersType = {
+  /**
+   * @default "x-alyvro-status"
+   */
+  status: string;
+
+  /**
+   * @default "x-alyvro-api-key"
+   */
+  apiKey: string;
+
+  /**
+   * @default "x-alyvro-body-type"
+   */
+  bodyType: string;
+};
+
+export type ConfigMiddlewareErrorsType = {
+  /**
+   * @default "no access to this api"
+   */
+  forbidden: string;
+};
+
 export type ConfigMiddlewareType = {
-  headers: Partial<{
-    /**
-     * @default "x-alyvro-status"
-     */
-    status: string;
+  headers: Partial<ConfigMiddlewareHeadersType>;
 
-    /**
-     * @default "x-alyvro-api-key"
-     */
-    apiKey: string;
-
-    /**
-     * @default "x-alyvro-body-type"
-     */
-    bodyType: string;
-  }>;
-
-  errors: Partial<{
-    /**
-     * @default "no access to this api"
-     */
-    forbidden: string;
-  }>;
+  errors: Partial<ConfigMiddlewareErrorsType>;
 
   skip_routers: string[];
 

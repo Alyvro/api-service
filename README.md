@@ -86,14 +86,13 @@ const app = express();
 const api = new ApiService({
   url: "https://alyvro.com",
   settings: { telegram: true }, // enables Telegram error reporting
+  middleware: {
+    skip_routers: ["/health", "/status"],
+  },
 });
 
 // Middleware with skip_routers option
-app.use((req, res, next) =>
-  api.server.middleware(req, res, next, {
-    skip_routers: ["/health", "/status"],
-  })
-);
+app.use((req, res, next) => api.server.middleware(req, res, next));
 
 app.get("/", (req, res) => {
   res.json({ message: "Hello world!" });
@@ -108,16 +107,21 @@ All server errors will automatically be sent to your Telegram bot.
 
 ## ⚙️ Config Options
 
-| Key                | Type                         | Required                | Description                                                    |
-| ------------------ | ---------------------------- | ----------------------- | -------------------------------------------------------------- |
-| `url`              | `string`                     | ✅                      | Base URL for sending HTTP requests                             |
-| `logger`           | `boolean`                    | ❌                      | Enable request/response logging (for debugging)                |
-| `auth`             | `AxiosBasicCredentials`      | ❌                      | HTTP Basic Auth credentials (`{ username, password }`)         |
-| `env`              | `ConfigEnvType`              | ❌                      | API keys and environment secrets                               |
-| `env.PRIVATE_KEY`  | `string`                     | ✅ _(if used)_          | Your private key (used in secure requests)                     |
-| `env.PUBLIC_KEY`   | `string`                     | ✅ _(if used)_          | Your public key (used in client-side logic)                    |
-| `setting`          | `Partial<ConfigSettingType>` | ❌                      | Additional settings for features like Telegram error reporting |
-| `setting.telegram` | `boolean`                    | ✅ _(if Telegram used)_ | Telegram Bot used for error notifications                      |
+| Key                       | Type                                   | Required                                   | Description                                                    |
+| ------------------------- | -------------------------------------- | ------------------------------------------ | -------------------------------------------------------------- |
+| `url`                     | `string`                               | ✅                                         | Base URL for sending HTTP requests                             |
+| `logger`                  | `boolean`                              | ❌                                         | Enable request/response logging (for debugging)                |
+| `auth`                    | `AxiosBasicCredentials`                | ❌                                         | HTTP Basic Auth credentials (`{ username, password }`)         |
+| `env`                     | `ConfigEnvType`                        | ❌ _(if no set env variable in .env file)_ | API keys and environment secrets                               |
+| `env.PRIVATE_KEY`         | `string`                               | ✅ _(if used)_                             | Your private key (used in secure requests)                     |
+| `env.PUBLIC_KEY`          | `string`                               | ✅ _(if used)_                             | Your public key (used in client-side logic)                    |
+| `setting`                 | `Partial<ConfigSettingType>`           | ❌                                         | Additional settings for features like Telegram error reporting |
+| `setting.telegram`        | `boolean`                              | ✅ _(if Telegram used)_                    | Telegram Bot used for error notifications                      |
+| `middleware`              | `Partial<ConfigMiddlewareType>`        | ❌                                         | server **Middleware** settings                                 |
+| `middleware.headers`      | `Partial<ConfigMiddlewareHeadersType>` | ❌                                         | headers names                                                  |
+| `middleware.errors`       | `Partial<ConfigMiddlewareErrorsType>`  | ❌                                         | handlers errors                                                |
+| `middleware.skip_routers` | `Partial<ConfigMiddlewareErrorsType>`  | ❌                                         | add router to not check                                        |
+| `middleware.powerd_by`    | `string`                               | ❌                                         | add custom powerd_by                                           |
 
 ---
 
