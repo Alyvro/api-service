@@ -1,5 +1,5 @@
 import { retry } from "@/plugins/retry";
-import type { ConfigEnvType } from "@/types/config";
+import type { ConfigEnvType, ConfigMiddlewareType } from "@/types/config";
 import Encrypt from "@/utils/enc";
 import axios, { type AxiosBasicCredentials } from "axios";
 import jwt from "jsonwebtoken";
@@ -10,7 +10,8 @@ const { sign } = jwt;
 export default function (
   url: string,
   auth?: AxiosBasicCredentials,
-  env?: ConfigEnvType
+  env?: ConfigEnvType,
+  config_middleware?: Partial<ConfigMiddlewareType>
 ) {
   const api = axios.create({
     baseURL: url,
@@ -21,13 +22,17 @@ export default function (
     const { encryptSecureBlob } = Encrypt(env);
     const secret = config.secret;
 
-    config.headers["x-alyvro-api-key"] = sign(
-      { data: "alyvro-secret-api-service" },
-      env?.PRIVATE_KEY!,
-      { expiresIn: "10min" }
-    );
-    config.headers["x-alyvro-body-type"] = secret?.body ? "sec" : "none";
-    config.headers["x-alyvro-status"] = config.status ?? true;
+    config.headers[config_middleware?.headers?.apiKey ?? "x-alyvro-api-key"] =
+      sign({ data: "alyvro-secret-api-service" }, env?.PRIVATE_KEY!, {
+        expiresIn: "10min",
+      });
+
+    config.headers[
+      config_middleware?.headers?.bodyType ?? "x-alyvro-body-type"
+    ] = secret?.body ? "sec" : "none";
+
+    config.headers[config_middleware?.headers?.status ?? "x-alyvro-status"] =
+      config.status ?? true;
 
     if (config.plugins?.compressor && config?.data) {
       const str = JSON.stringify(config.data);

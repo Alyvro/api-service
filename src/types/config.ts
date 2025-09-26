@@ -8,8 +8,42 @@ export type ConfigEnvType = {
 export type ConfigSettingType = {
   /**
    * if error in server side, api-service send error message for your telegram bot
+   * @default false
    */
   telegram: boolean;
+};
+
+export type ConfigMiddlewareType = {
+  headers: Partial<{
+    /**
+     * @default "x-alyvro-status"
+     */
+    status: string;
+
+    /**
+     * @default "x-alyvro-api-key"
+     */
+    apiKey: string;
+
+    /**
+     * @default "x-alyvro-body-type"
+     */
+    bodyType: string;
+  }>;
+
+  errors: Partial<{
+    /**
+     * @default "no access to this api"
+     */
+    forbidden: string;
+  }>;
+
+  skip_routers: string[];
+
+  /**
+   * @default "alvyro"
+   */
+  powerd_by: string;
 };
 
 export type ConfigType = {
@@ -18,4 +52,5 @@ export type ConfigType = {
   auth?: AxiosBasicCredentials;
   env?: ConfigEnvType;
   setting?: Partial<ConfigSettingType>;
+  middleware?: Partial<ConfigMiddlewareType>;
 };

@@ -37,15 +37,15 @@ const sendTelegramMessage = async (
 const sendErrorMessage = async (
   req: Request,
   res: Response,
-  config: ConfigType,
-  options?: Partial<MiddlewareOptions>
+  config: ConfigType
 ) => {
-  const powerd_by = options?.powerd_by ?? "alyvro/api-service";
+  const powerd_by = config.middleware?.powerd_by ?? "alyvro/api-service";
 
   if (config.setting?.telegram) {
     await sendTelegramMessage(
       {
-        message: "no access to this api",
+        message:
+          config.middleware?.errors?.forbidden ?? "no access to this api",
         method: req.method,
         originalUrl: req.originalUrl,
         status_code: "403",
@@ -55,7 +55,7 @@ const sendErrorMessage = async (
   }
 
   res.status(403).json({
-    message: "no access to this api",
+    message: config.middleware?.errors?.forbidden ?? "no access to this api",
     status: 403,
     powerd_by,
   });
@@ -64,17 +64,16 @@ const sendErrorMessage = async (
 export default async function middleware(
   req: Request,
   res: Response,
-  next: NextFunction,
-  options?: Partial<MiddlewareOptions>
+  next: NextFunction
 ) {
+  const config = getConfigStorage();
+
   if (
-    options?.skip_routers?.length &&
-    options.skip_routers.includes(req.path)
+    config?.middleware?.skip_routers?.length &&
+    config.middleware.skip_routers.includes(req.path)
   ) {
     return next();
   }
-
-  const config = getConfigStorage();
 
   if (!config) throw new Error("Config no install");
 
@@ -84,19 +83,22 @@ export default async function middleware(
     throw new Error("Please set Private Key in env file or apiService config");
 
   try {
-    const alyvroStatus = req.headers["x-alyvro-status"];
+    const alyvroStatus =
+      req.headers[config.middleware?.headers?.status ?? "x-alyvro-status"];
 
     if (!alyvroStatus) {
-      sendErrorMessage(req, res, config, options);
+      sendErrorMessage(req, res, config);
 
       return;
     }
 
-    const alyvroKey = req.headers["x-alyvro-api-key"];
-    const alyvroBodyType = req.headers["x-alyvro-body-type"];
+    const alyvroKey =
+      req.headers[config.middleware?.headers?.apiKey ?? "x-alyvro-api-key"];
+    const alyvroBodyType =
+      req.headers[config.middleware?.headers?.bodyType ?? "x-alyvro-body-type"];
 
     if (!alyvroKey || typeof alyvroKey !== "string") {
-      sendErrorMessage(req, res, config, options);
+      sendErrorMessage(req, res, config);
       return;
     }
 
@@ -150,7 +152,7 @@ export default async function middleware(
 
     return next();
   } catch {
-    sendErrorMessage(req, res, config, options);
+    sendErrorMessage(req, res, config);
     return;
   }
 }

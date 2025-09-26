@@ -33,7 +33,12 @@ export class ApiService extends ApiServiceType {
   public get client() {
     return {
       axios: {
-        request: api(this.data.url, this.data.auth, this.data.env),
+        request: api(
+          this.data.url,
+          this.data.auth,
+          this.data.env,
+          this.data.middleware
+        ),
       },
       fetch: {
         request: fetcher,

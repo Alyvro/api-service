@@ -21,13 +21,19 @@ export default async function fetcher<T = unknown>(
     const headers = new Headers(init?.headers);
 
     headers.set(
-      "x-alyvro-api-key",
+      config.middleware?.headers?.apiKey ?? "x-alyvro-api-key",
       sign({ data: "alyvro-secret-api-service" }, env?.PRIVATE_KEY!, {
         expiresIn: "10min",
       })
     );
-    headers.set("x-alyvro-body-type", "none");
-    headers.set("x-alyvro-status", String(init?.status ?? true));
+    headers.set(
+      config.middleware?.headers?.bodyType ?? "x-alyvro-body-type",
+      "none"
+    );
+    headers.set(
+      config.middleware?.headers?.status ?? "x-alyvro-status",
+      String(init?.status ?? true)
+    );
 
     if (auth?.username && auth?.password) {
       headers.set(
