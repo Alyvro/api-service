@@ -53,6 +53,14 @@ export default async function fetcher<T = unknown>(
   const finalInit: RequestInitType = {
     ...init,
     headers: buildHeaders(),
+    ...(init?.body
+      ? {
+          body:
+            typeof init.body === "string"
+              ? init.body
+              : JSON.stringify(init.body),
+        }
+      : undefined),
   };
 
   const finalUrl = url.concat(input);

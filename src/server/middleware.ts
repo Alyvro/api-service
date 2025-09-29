@@ -1,4 +1,3 @@
-import type { MiddlewareOptions } from "@/types/middleware";
 import type { TelegramNetworkObjectType } from "@/types/telegram";
 import type { NextFunction, Request, Response } from "express";
 

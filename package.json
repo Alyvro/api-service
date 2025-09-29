@@ -50,20 +50,6 @@
     "email": "support@alyvro.com"
   },
   "packageManager": "pnpm@10.11.1",
-  "funding": [
-    {
-      "type": "crypto",
-      "url": "usdt-trc20:TFqgU6Fa9ysHBRPzZT6FboX9DZ96gcCPR5"
-    },
-    {
-      "type": "crypto",
-      "url": "ton:UQDhIG21wTkqa9Z7tEAqsasiTN5kcAE7-ZNLHuaUw_9W4AW5"
-    },
-    {
-      "type": "crypto",
-      "url": "trx:TFqgU6Fa9ysHBRPzZT6FboX9DZ96gcCPR5"
-    }
-  ],
   "dependencies": {
     "axios": "^1.11.0",
     "express": "^5.1.0",

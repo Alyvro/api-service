@@ -1,6 +1,5 @@
 import type { Request, Response, NextFunction } from "express";
 import type { ConfigType } from "@/types/config";
-import type { MiddlewareOptions } from "./middleware";
 
 export abstract class ApiServiceType {
   protected data: ConfigType;
@@ -22,8 +21,7 @@ export abstract class ApiServiceType {
     middleware: (
       req: Request,
       res: Response,
-      next: NextFunction,
-      options?: Partial<MiddlewareOptions>
+      next: NextFunction
     ) => Promise<void>;
   };
 }
