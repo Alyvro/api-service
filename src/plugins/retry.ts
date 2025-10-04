@@ -1,10 +1,10 @@
-import { RetryAxiosRequestConfig } from "@/types/retry";
-import type { AxiosInstance, AxiosError } from "axios";
+import type { AlyvroAxiosInstance, AlyvroInternalConfig } from "@/types/api";
+import type { AxiosError } from "axios";
 
-export const retry = (instance: AxiosInstance) => {
+export const retry = (instance: AlyvroAxiosInstance) => {
   instance.interceptors.response.use(
     (res) => res,
-    async (error: AxiosError & { config?: RetryAxiosRequestConfig }) => {
+    async (error: AxiosError & { config?: AlyvroInternalConfig }) => {
       const config = error.config;
       const retryOpts = config?.plugins?.retry;
 
@@ -21,7 +21,9 @@ export const retry = (instance: AxiosInstance) => {
 
       await new Promise((res) => setTimeout(res, delay));
 
-      return instance.request(config);
+      if (!config.url) throw error;
+
+      return instance.request(config as any);
     }
   );
 };

@@ -15,6 +15,7 @@
 - ✅ Fully configurable via a simple object
 - ✅ Plugin system for extra features (Cache, Compressor, Retry, Cancel, …)
 - ✅ Lightweight, fast, and production-ready
+- ✅ Typed Axios response
 
 ### 📦 Installation
 
@@ -42,7 +43,7 @@ const api = new ApiService({ api_url: "https://api.alyvro.com" });
 const controller = createAbortController();
 
 // Using Axios
-const axiosResponse = await api.client.axios.request.post(
+const axiosResponse = await api.client.axios.request().post(
   "/user",
   { index: "foo" },
   {
@@ -102,6 +103,55 @@ app.get("/", (req, res) => {
 Middleware now supports skipping routes via `skip_routers`. Requests matching any path in this array will bypass the middleware.
 
 All server errors will automatically be sent to your Telegram bot.
+
+---
+
+### Typed Axios Example
+
+With this setup, you can define a strongly-typed mapping of your API endpoints and their expected responses. This allows TypeScript to infer the correct response type automatically based on the URL you pass.
+
+#### Example
+
+```ts
+// Define your API schema mapping endpoints to their response types
+const apis = new ApiService({
+  url: "https://api.example.com",
+}).client.axios.request<{
+  "/": { index: number };
+  "/auth": { success: boolean };
+  "/profile": { id: string; name: string; email: string };
+}>();
+
+// GET request - TypeScript infers the response type as { index: number }
+apis.get("/").then((res) => {
+  console.log(res.data.index); // ✅ res.data.index is a number
+});
+
+// POST request - TypeScript infers the response type as { success: boolean }
+apis.post("/auth", { username: "john", password: "secret" }).then((res) => {
+  if (res.data.success) {
+    console.log("Login successful ✅");
+  }
+});
+
+// PATCH request - TypeScript infers the response type as { id: string; name: string; email: string }
+apis.patch("/profile", { name: "John Doe" }).then((res) => {
+  console.log(res.data.email); // ✅ res.data.email is a string
+});
+
+// DELETE request - also fully typed
+apis.delete("/profile").then((res) => {
+  console.log(res.data.id); // ✅ res.data.id is a string
+});
+```
+
+#### Benefits
+
+- **Type-safe endpoints**: Each endpoint URL is strongly typed, so you can’t accidentally mistype.
+- **Automatic inference**: No need to manually annotate response types, they are inferred from the schema.
+- **Better DX**: Autocomplete and IntelliSense show the correct response structure per endpoint.
+
+This pattern combines the flexibility of Axios with the type-safety of a predefined API schema.
 
 ---
 

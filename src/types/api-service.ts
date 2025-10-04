@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
 import type { ConfigType } from "@/types/config";
+import type { AlyvroAxiosInstance } from "./api";
 
 export abstract class ApiServiceType {
   protected data: ConfigType;
@@ -10,7 +11,7 @@ export abstract class ApiServiceType {
 
   abstract get client(): {
     axios: {
-      request: ReturnType<typeof import("@/client/api").default>;
+      request: <U extends string = string>() => AlyvroAxiosInstance<U>;
     };
     fetch: {
       request: typeof import("@/client/fetcher").default;

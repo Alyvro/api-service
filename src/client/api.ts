@@ -1,4 +1,5 @@
 import { retry } from "@/plugins/retry";
+import type { AlyvroAxiosInstance, ApiResponseMapDefault } from "@/types/api";
 import type { ConfigEnvType, ConfigMiddlewareType } from "@/types/config";
 import Encrypt from "@/utils/enc";
 import axios, { type AxiosBasicCredentials } from "axios";
@@ -7,20 +8,20 @@ import { gunzipSync, gzipSync } from "zlib";
 
 const { sign } = jwt;
 
-export default function (
-  url: string,
+export default function <M extends Record<string, any> = ApiResponseMapDefault>(
+  base: string,
   auth?: AxiosBasicCredentials,
   env?: ConfigEnvType,
   config_middleware?: Partial<ConfigMiddlewareType>
-) {
+): AlyvroAxiosInstance<M> {
   const api = axios.create({
-    baseURL: url,
+    baseURL: base,
     auth,
-  });
+  }) as AlyvroAxiosInstance<M>;
 
   api.interceptors.request.use((config) => {
     const { encryptSecureBlob } = Encrypt(env);
-    const secret = config.secret;
+    const secret = (config as any).secret;
 
     config.headers[config_middleware?.headers?.apiKey ?? "x-alyvro-api-key"] =
       sign({ data: "alyvro-secret-api-service" }, env?.PRIVATE_KEY!, {
@@ -32,9 +33,9 @@ export default function (
     ] = secret?.body ? "sec" : "none";
 
     config.headers[config_middleware?.headers?.status ?? "x-alyvro-status"] =
-      config.status ?? true;
+      (config as any).status ?? true;
 
-    if (config.plugins?.compressor && config?.data) {
+    if ((config as any).plugins?.compressor && config?.data) {
       const str = JSON.stringify(config.data);
       config.data = gzipSync(str);
       config.headers["Content-Encoding"] = "gzip";
@@ -67,9 +68,12 @@ export default function (
 
     const parsed = data;
 
-    if (res.config?.plugins?.cache) {
+    if ((res.config as any)?.plugins?.cache) {
       const key = res.config.url!;
-      return { ...res, data: res.config.plugins.cache.set(key, parsed) };
+      return {
+        ...res,
+        data: (res.config as any).plugins.cache.set(key, parsed),
+      };
     }
 
     return { ...res, data: parsed };

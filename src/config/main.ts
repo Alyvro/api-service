@@ -3,6 +3,7 @@ import fetcher from "@/client/fetcher";
 import { serverCache, serverCachePlugin } from "@/plugins/cache/server";
 import middleware from "@/server/middleware";
 import { setConfigStorage } from "@/storage";
+import { ApiResponseMapDefault } from "@/types/api";
 import { ApiServiceType } from "@/types/api-service";
 import type { ConfigType } from "@/types/config";
 
@@ -33,12 +34,13 @@ export class ApiService extends ApiServiceType {
   public get client() {
     return {
       axios: {
-        request: api(
-          this.data.url,
-          this.data.auth,
-          this.data.env,
-          this.data.middleware
-        ),
+        request: <M extends Record<string, any> = ApiResponseMapDefault>() =>
+          api<M>(
+            this.data.url,
+            this.data.auth,
+            this.data.env,
+            this.data.middleware
+          ),
       },
       fetch: {
         request: fetcher,

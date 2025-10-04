@@ -50,6 +50,11 @@ export type ConfigMiddlewareType = {
   powerd_by: string;
 };
 
+export type ApiTypes = {
+  prefix: string;
+  data_returns: any;
+};
+
 export type ConfigType = {
   url: string;
   logger?: boolean;
@@ -57,4 +62,5 @@ export type ConfigType = {
   env?: ConfigEnvType;
   setting?: Partial<ConfigSettingType>;
   middleware?: Partial<ConfigMiddlewareType>;
+  api_types?: ApiTypes[];
 };
