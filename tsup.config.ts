@@ -11,7 +11,7 @@ export default defineConfig({
   silent: true,
   cjsInterop: true,
   metafile: true,
-  globalName: "Blast",
+  globalName: "ApiService",
   legacyOutput: true,
   keepNames: false,
   platform: "node",
