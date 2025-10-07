@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/Alyvro/api-service/compare/v1.0.10...v1.1.1) (2025-10-07)
+
+### Bug Fixes
+
+* dts types ([c898017](https://github.com/Alyvro/api-service/commit/c898017941cd8dd31d5f87e43143366478440879))
+* versions ([ed7790b](https://github.com/Alyvro/api-service/commit/ed7790b24def3f0e8450e2d27344cb27c8d30b72))
+
 ## [1.0.11](https://github.com/Alyvro/api-service/compare/v1.0.10...v1.0.11) (2025-10-07)
 
 ### Bug Fixes
