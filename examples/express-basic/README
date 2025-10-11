@@ -1,0 +1,11 @@
+# Express Basic Example
+
+## Backend
+cd backend
+npm install
+TELEGRAM_BOT_TOKEN=your_token TELEGRAM_CHAT_ID=your_chat_id npm start
+
+## Frontend
+cd frontend
+npm install
+npm start

@@ -21,4 +21,5 @@ export default defineConfig({
   minify: true,
   outDir: "dist",
   external: ["express"],
+  bundle: true,
 });

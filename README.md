@@ -17,6 +17,15 @@
 - ✅ Lightweight, fast, and production-ready
 - ✅ Typed Axios response
 
+---
+
+## Examples
+
+- [Basic Express Usage](./examples/express-basic)
+<!-- - [Express + Telegram Logging](./examples/express-with-telegram) -->
+
+---
+
 ### 📦 Installation
 
 ```bash
