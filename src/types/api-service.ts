@@ -1,5 +1,5 @@
 import type { ConfigType } from "@/types/config";
-import type { AlyvroAxiosInstance, ApiResponseMapDefault } from "./api";
+import type { AlyvroAxiosInstance, ServiceSchema } from "./api";
 
 export abstract class ApiServiceType {
   protected data: ConfigType;
@@ -10,9 +10,7 @@ export abstract class ApiServiceType {
 
   abstract get client(): {
     axios: {
-      request: <
-        M extends Record<string, any> = ApiResponseMapDefault,
-      >() => AlyvroAxiosInstance<M>;
+      request: <S extends ServiceSchema = any>() => AlyvroAxiosInstance<S>;
     };
     fetch: {
       request: typeof import("@/client/fetcher").default;

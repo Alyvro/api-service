@@ -20,56 +20,82 @@ export type ServiceSchema = {
   >;
 };
 
-type ExtractResponse<
-  S extends ServiceSchema,
-  U extends keyof S,
-  M extends ServiceMethod,
-> = S[U][M] extends { response: infer R } ? R : any;
+type RoutesWithMethod<S extends ServiceSchema, M extends ServiceMethod> = {
+  [K in keyof S]: M extends keyof S[K] ? K : never;
+}[keyof S];
 
 type ExtractBody<
   S extends ServiceSchema,
   U extends keyof S,
   M extends ServiceMethod,
-> = S[U][M] extends { body: infer B } ? B : any;
+> = M extends keyof S[U]
+  ? S[U][M] extends { body: infer B }
+    ? B
+    : undefined
+  : undefined;
+
+type ExtractResponse<
+  S extends ServiceSchema,
+  U extends keyof S,
+  M extends ServiceMethod,
+> = M extends keyof S[U]
+  ? S[U][M] extends { response: infer R }
+    ? R
+    : any
+  : any;
 
 type ExtractParams<
   S extends ServiceSchema,
   U extends keyof S,
   M extends ServiceMethod,
-> = S[U][M] extends { params: infer P } ? P : any;
+> = M extends keyof S[U]
+  ? S[U][M] extends { params: infer P }
+    ? P
+    : undefined
+  : undefined;
+
+// ------------------------------------------
+// Main Type Definition
+// ------------------------------------------
 
 export type AlyvroAxiosInstance<S extends ServiceSchema = any> = Omit<
   AxiosInstance,
   "request" | "get" | "post" | "patch" | "delete" | "put"
 > & {
-  get<U extends keyof S>(
+  get<U extends RoutesWithMethod<S, "GET">>(
     url: U,
     config?: AxiosRequestConfig & { params?: ExtractParams<S, U, "GET"> },
   ): Promise<AxiosResponse<ExtractResponse<S, U, "GET">>>;
 
-  post<U extends keyof S>(
-    url: U,
-    data?: ExtractBody<S, U, "POST">,
-    config?: AxiosRequestConfig,
-  ): Promise<AxiosResponse<ExtractResponse<S, U, "POST">>>;
-
-  put<U extends keyof S>(
-    url: U,
-    data?: ExtractBody<S, U, "PUT">,
-    config?: AxiosRequestConfig,
-  ): Promise<AxiosResponse<ExtractResponse<S, U, "PUT">>>;
-
-  patch<U extends keyof S>(
-    url: U,
-    data?: ExtractBody<S, U, "PATCH">,
-    config?: AxiosRequestConfig,
-  ): Promise<AxiosResponse<ExtractResponse<S, U, "PATCH">>>;
-
-  delete<U extends keyof S>(
+  delete<U extends RoutesWithMethod<S, "DELETE">>(
     url: U,
     config?: AxiosRequestConfig & { params?: ExtractParams<S, U, "DELETE"> },
   ): Promise<AxiosResponse<ExtractResponse<S, U, "DELETE">>>;
 
+  post<U extends RoutesWithMethod<S, "POST">>(
+    url: U,
+    ...args: ExtractBody<S, U, "POST"> extends undefined
+      ? [data?: any, config?: AxiosRequestConfig]
+      : [data: ExtractBody<S, U, "POST">, config?: AxiosRequestConfig]
+  ): Promise<AxiosResponse<ExtractResponse<S, U, "POST">>>;
+
+  // --- PUT ---
+  put<U extends RoutesWithMethod<S, "PUT">>(
+    url: U,
+    ...args: ExtractBody<S, U, "PUT"> extends undefined
+      ? [data?: any, config?: AxiosRequestConfig]
+      : [data: ExtractBody<S, U, "PUT">, config?: AxiosRequestConfig]
+  ): Promise<AxiosResponse<ExtractResponse<S, U, "PUT">>>;
+
+  // --- PATCH ---
+  patch<U extends RoutesWithMethod<S, "PATCH">>(
+    url: U,
+    ...args: ExtractBody<S, U, "PATCH"> extends undefined
+      ? [data?: any, config?: AxiosRequestConfig]
+      : [data: ExtractBody<S, U, "PATCH">, config?: AxiosRequestConfig]
+  ): Promise<AxiosResponse<ExtractResponse<S, U, "PATCH">>>;
+
+  // --- Generic Request ---
   request<U extends keyof S, M extends ServiceMethod>(
     config: AxiosRequestConfig & {
       url: U;
