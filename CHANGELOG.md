@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.3.3](https://github.com/Alyvro/api-service/compare/v1.2.1...v1.3.3) (2026-02-15)
+
+### Bug Fixes
+
+* generate api map ([95bdd73](https://github.com/Alyvro/api-service/commit/95bdd736cd7ac98a32b66a7b2fe9fe7c71d16112))
+
 ## [1.2.1](https://github.com/Alyvro/api-service/compare/v1.0.10...v1.2.1) (2025-10-11)
 
 ### Bug Fixes
