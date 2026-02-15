@@ -1,5 +1,5 @@
 import { retry } from "@/plugins/retry";
-import type { AlyvroAxiosInstance, ApiResponseMapDefault } from "@/types/api";
+import type { AlyvroAxiosInstance, ServiceSchema } from "@/types/api";
 import type { ConfigEnvType, ConfigMiddlewareType } from "@/types/config";
 import Encrypt from "@/utils/enc";
 import axios, { type AxiosBasicCredentials } from "axios";
@@ -8,16 +8,16 @@ import { gunzipSync, gzipSync } from "zlib";
 
 const { sign } = jwt;
 
-export default function <M extends Record<string, any> = ApiResponseMapDefault>(
+export default function <S extends ServiceSchema = any>(
   base: string,
   auth?: AxiosBasicCredentials,
   env?: ConfigEnvType,
-  config_middleware?: Partial<ConfigMiddlewareType>
-): AlyvroAxiosInstance<M> {
+  config_middleware?: Partial<ConfigMiddlewareType>,
+): AlyvroAxiosInstance<S> {
   const api = axios.create({
     baseURL: base,
     auth,
-  }) as AlyvroAxiosInstance<M>;
+  }) as unknown as AlyvroAxiosInstance<S>;
 
   api.interceptors.request.use((config) => {
     const { encryptSecureBlob } = Encrypt(env);
@@ -45,7 +45,7 @@ export default function <M extends Record<string, any> = ApiResponseMapDefault>(
       config.data = encryptSecureBlob(
         typeof config.data === "string"
           ? config.data
-          : JSON.stringify(config.data)
+          : JSON.stringify(config.data),
       );
     }
 
@@ -73,13 +73,13 @@ export default function <M extends Record<string, any> = ApiResponseMapDefault>(
       return {
         ...res,
         data: (res.config as any).plugins.cache.set(key, parsed),
-      };
+      } as any;
     }
 
-    return { ...res, data: parsed };
+    return { ...res, data: parsed } as any;
   });
 
-  retry(api);
+  retry(api as any);
 
   return api;
 }

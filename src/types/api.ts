@@ -5,38 +5,79 @@ import type {
   AxiosResponse,
 } from "axios";
 
-export type ApiResponseMapDefault = {
-  [url: string]: any;
+export type ServiceMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+
+export type ServiceSchema = {
+  [url: string]: Partial<
+    Record<
+      ServiceMethod,
+      {
+        response: any;
+        body?: any;
+        params?: any;
+      }
+    >
+  >;
 };
 
-export type AlyvroAxiosInstance<
-  M extends Record<string, any> = ApiResponseMapDefault
-> = Omit<AxiosInstance, "request" | "get" | "post" | "patch" | "delete"> & {
-  request<P extends keyof M>(
-    config: AxiosRequestConfig & { url: P }
-  ): Promise<AxiosResponse<M[P], any>>;
+type ExtractResponse<
+  S extends ServiceSchema,
+  U extends keyof S,
+  M extends ServiceMethod,
+> = S[U][M] extends { response: infer R } ? R : any;
 
-  get<P extends keyof M>(
-    url: P,
-    config?: AxiosRequestConfig
-  ): Promise<AxiosResponse<M[P], any>>;
+type ExtractBody<
+  S extends ServiceSchema,
+  U extends keyof S,
+  M extends ServiceMethod,
+> = S[U][M] extends { body: infer B } ? B : any;
 
-  post<P extends keyof M, D = any>(
-    url: P,
-    data?: D,
-    config?: AxiosRequestConfig
-  ): Promise<AxiosResponse<M[P], any>>;
+type ExtractParams<
+  S extends ServiceSchema,
+  U extends keyof S,
+  M extends ServiceMethod,
+> = S[U][M] extends { params: infer P } ? P : any;
 
-  patch<P extends keyof M, D = any>(
-    url: P,
-    data?: D,
-    config?: AxiosRequestConfig
-  ): Promise<AxiosResponse<M[P], any>>;
+export type AlyvroAxiosInstance<S extends ServiceSchema = any> = Omit<
+  AxiosInstance,
+  "request" | "get" | "post" | "patch" | "delete" | "put"
+> & {
+  get<U extends keyof S>(
+    url: U,
+    config?: AxiosRequestConfig & { params?: ExtractParams<S, U, "GET"> },
+  ): Promise<AxiosResponse<ExtractResponse<S, U, "GET">>>;
 
-  delete<P extends keyof M, D = any>(
-    url: P,
-    config?: AxiosRequestConfig
-  ): Promise<AxiosResponse<M[P], any>>;
+  post<U extends keyof S>(
+    url: U,
+    data?: ExtractBody<S, U, "POST">,
+    config?: AxiosRequestConfig,
+  ): Promise<AxiosResponse<ExtractResponse<S, U, "POST">>>;
+
+  put<U extends keyof S>(
+    url: U,
+    data?: ExtractBody<S, U, "PUT">,
+    config?: AxiosRequestConfig,
+  ): Promise<AxiosResponse<ExtractResponse<S, U, "PUT">>>;
+
+  patch<U extends keyof S>(
+    url: U,
+    data?: ExtractBody<S, U, "PATCH">,
+    config?: AxiosRequestConfig,
+  ): Promise<AxiosResponse<ExtractResponse<S, U, "PATCH">>>;
+
+  delete<U extends keyof S>(
+    url: U,
+    config?: AxiosRequestConfig & { params?: ExtractParams<S, U, "DELETE"> },
+  ): Promise<AxiosResponse<ExtractResponse<S, U, "DELETE">>>;
+
+  request<U extends keyof S, M extends ServiceMethod>(
+    config: AxiosRequestConfig & {
+      url: U;
+      method: M;
+      data?: ExtractBody<S, U, M>;
+      params?: ExtractParams<S, U, M>;
+    },
+  ): Promise<AxiosResponse<ExtractResponse<S, U, M>>>;
 };
 
 export type AlyvroInternalConfig = InternalAxiosRequestConfig<any> & {

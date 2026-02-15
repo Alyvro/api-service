@@ -131,8 +131,18 @@ Define your API schema once and get full auto-completion and type inference for 
 import { ApiService } from "@alyvro/api-service";
 
 type ApiSchema = {
-  "/users": { id: number; name: string }[];
-  "/auth/login": { token: string };
+  "/users": {
+    GET: {
+      response: { id: number; name: string }[];
+      params: { page: number };
+    };
+  };
+  "/auth/login": {
+    POST: {
+      body: { username: string };
+      response: { token: string };
+    };
+  };
 };
 
 const api = new ApiService({
@@ -145,7 +155,7 @@ api.post("/auth/login", { username: "admin" }).then((res) => {
 });
 
 // ✅ TypeScript knows this returns Array<{ id: number; name: string }>
-api.get("/users").then((res) => {
+api.get("/users", { params: { page: 1 } }).then((res) => {
   console.log(res.data[0].name);
 });
 ```
