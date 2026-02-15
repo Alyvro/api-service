@@ -134,7 +134,7 @@ type ApiSchema = {
   "/users": {
     GET: {
       response: { id: number; name: string }[];
-      params: { page: number };
+      params: { page: number; index: number };
     };
   };
   "/auth/login": {
