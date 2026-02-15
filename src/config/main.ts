@@ -1,7 +1,6 @@
 import api from "@/client/api";
 import fetcher from "@/client/fetcher";
 import { serverCache, serverCachePlugin } from "@/plugins/cache/server";
-import middleware from "@/server/middleware";
 import { setConfigStorage } from "@/storage";
 import { ApiResponseMapDefault } from "@/types/api";
 import { ApiServiceType } from "@/types/api-service";
@@ -18,7 +17,7 @@ export class ApiService extends ApiServiceType {
       throw new Error(
         `Error to get ${
           privateKey ? "PRIVATE_KEY" : "PUBLIC_KEY"
-        }\nplease set on .env config or in ApiService options`
+        }\nplease set on .env config or in ApiService options`,
       );
     }
 
@@ -39,18 +38,12 @@ export class ApiService extends ApiServiceType {
             this.data.url,
             this.data.auth,
             this.data.env,
-            this.data.middleware
+            this.data.middleware,
           ),
       },
       fetch: {
         request: fetcher,
       },
-    };
-  }
-
-  public get server() {
-    return {
-      middleware,
     };
   }
 

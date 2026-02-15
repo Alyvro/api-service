@@ -1,6 +1,6 @@
 {
   "name": "@alyvro/api-service",
-  "version": "1.2.1",
+  "version": "1.3.0",
   "description": "A minimal yet powerful service for sending HTTP requests on the client and handling them gracefully on the server. No complicated setup. Just plug in your keys — and you're ready to go.",
   "types": "./dist/index.d.ts",
   "main": "./dist/index.js",
@@ -11,9 +11,19 @@
   ],
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/esm/index.js",
-      "require": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/index.js"
+    },
+    "./express": {
+      "types": "./dist/express.d.ts",
+      "import": "./dist/esm/express.js",
+      "require": "./dist/express.js"
+    },
+    "./fastify": {
+      "types": "./dist/fastify.d.ts",
+      "import": "./dist/esm/fastify.js",
+      "require": "./dist/fastify.js"
     },
     "./plugins": {
       "types": "./dist/plugins.d.ts",
@@ -46,22 +56,52 @@
   "author": "alyvro",
   "license": "MIT",
   "repository": {
-    "url": "git+https://github.com/Alyvro/api-service.git"
+    "type": "git",
+    "url": "https://github.com/Alyvro/api-service.git"
   },
   "bugs": {
     "url": "https://github.com/Alyvro/api-service/issues",
     "email": "support@alyvro.com"
   },
   "packageManager": "pnpm@10.11.1",
+  "peerDependencies": {
+    "express": "^4.0.0",
+    "fastify": "^4.0.0"
+  },
+  "typesVersions": {
+    "*": {
+      "express": [
+        "./dist/express.d.ts"
+      ],
+      "fastify": [
+        "./dist/fastify.d.ts"
+      ],
+      "plugins": [
+        "./dist/plugins.d.ts"
+      ],
+      "types": [
+        "./dist/types.d.ts"
+      ],
+      "*": [
+        "./dist/index.d.ts"
+      ]
+    }
+  },
+  "peerDependenciesMeta": {
+    "express": {
+      "optional": true
+    },
+    "fastify": {
+      "optional": true
+    }
+  },
   "dependencies": {
-    "axios": "^1.11.0",
-    "express": "^5.1.0",
+    "axios": "^1.12.2",
     "jsonwebtoken": "^9.0.2",
     "zlib": "^1.0.5"
   },
   "devDependencies": {
     "@release-it/conventional-changelog": "^10.0.1",
-    "@types/axios": "^0.14.4",
     "@types/express": "^5.0.3",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^24.1.0",

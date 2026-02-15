@@ -47,7 +47,7 @@ export type ConfigMiddlewareType = {
   /**
    * @default "alvyro"
    */
-  powerd_by: string;
+  powered_by: string;
 };
 
 export type ConfigType = {

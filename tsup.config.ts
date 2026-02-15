@@ -1,7 +1,13 @@
 import { defineConfig } from "tsup";
 
 export default defineConfig({
-  entry: ["./main/index.ts", "./main/plugins.ts", "./main/types.ts"],
+  entry: [
+    "./main/index.ts",
+    "./main/express.ts",
+    "./main/fastify.ts",
+    "./main/plugins.ts",
+    "./main/types.ts",
+  ],
   format: ["esm", "cjs"],
   dts: true,
   splitting: true,
@@ -20,6 +26,6 @@ export default defineConfig({
   minifyWhitespace: true,
   minify: true,
   outDir: "dist",
-  external: ["express"],
+  external: ["express", "fastify"],
   bundle: true,
 });

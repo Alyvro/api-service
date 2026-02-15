@@ -8,163 +8,183 @@
 
 ### 🚀 Features
 
-- ✅ Effortless HTTP requests on the client — built on top of Axios
-- ✅ Built-in fetch support for client-side requests
-- ✅ Express middleware support — add it once and manage everything centrally
-- ✅ Auto error reporting to Telegram — just provide your bot token & chat ID
-- ✅ Fully configurable via a simple object
-- ✅ Plugin system for extra features (Cache, Compressor, Retry, Cancel, …)
-- ✅ Lightweight, fast, and production-ready
-- ✅ Typed Axios response
-
----
-
-## Examples
-
-- [Basic Express Usage](./examples/express-basic)
-<!-- - [Express + Telegram Logging](./examples/express-with-telegram) -->
+- ✅ **Universal Support** — Works seamlessly on both Client and Server
+- ✅ **Modular Middleware** — Dedicated imports for Fastify & Express (Tree-shakable)
+- ✅ **Typed Axios** — Full TypeScript inference for your API endpoints
+- ✅ **Built-in Plugins** — Cache, Retry, Compressor, and Cancellation
+- ✅ **Auto Error Reporting** — Send server errors directly to Telegram
+- ✅ **Zero Config Start** — Works out of the box with minimal setup
 
 ---
 
 ### 📦 Installation
 
-```bash
+bash
 pnpm add @alyvro/api-service
+
 # or
+
 npm install @alyvro/api-service
-# or
-yarn add @alyvro/api-service
-```
+
+If you are using a specific framework, make sure it is installed (e.g., `fastify` or `express`).
 
 ---
 
-## ✨ Usage
+## ✨ Server-Side Usage
 
-### ➤ Client-side
+Initialize the service once in your application entry point.
+
+### ➤ Fastify
+
+Import the middleware directly from the fastify subpath. This ensures no Express dependencies are loaded.
 
 ```ts
+import Fastify from "fastify";
 import { ApiService } from "@alyvro/api-service";
-import { cache, createAbortController } from "@alyvro/api-service/plugins";
+import middleware from "@alyvro/api-service/fastify";
 
-const api = new ApiService({ api_url: "https://api.alyvro.com" });
+const fastify = Fastify();
 
-// Example: Request with cache, compressor, and retry
-const controller = createAbortController();
-
-// Using Axios
-const axiosResponse = await api.client.axios.request().post(
-  "/user",
-  { index: "foo" },
-  {
-    secret: { body: true },
-    signal: controller.signal,
-    plugins: {
-      // cache:cache or ApiService.plugins.cache,
-      compressor: true,
-      retry: { retries: 5, retryDelay: 500, backoff: true },
-    },
-  }
-);
-
-// Using fetch
-const fetchResponse = await api.client.fetch.request("/user", {
-  method: "POST",
-  body: { index: "foo" },
-  signal: controller.signal,
+new ApiService({
+  url: "http://localhost:3000",
+  setting: { telegram: true }, // Optional: Enable Telegram error logs
+  middleware: {
+    skip_routers: ["/health"],
+  },
 });
 
-// Cancel request if needed
-controller.abort();
+// Add the hook to handle API security and logging
+fastify.addHook("preHandler", middleware);
+
+fastify.get("/", async (request, reply) => {
+  return { hello: "world" };
+});
+
+fastify.listen({ port: 3000 });
 ```
 
-- `cache` → stores and reuses previous responses to reduce duplicate requests (client & server safe)
-- `compressor` → automatically compresses/decompresses payloads when supported by the server
-- `retry` → automatic per-request retry with configurable attempts, delay, and backoff
-- `createAbortController` → allows canceling requests on demand
-- ⚠️ **Note:** Plugins currently only work with Axios. Fetch does **not** support Axios plugins yet.
-
----
-
-### ➤ Server-side (Express)
+### ➤ Express
 
 ```ts
 import express from "express";
 import { ApiService } from "@alyvro/api-service";
+import middleware from "@alyvro/api-service/express";
 
 const app = express();
 
+new ApiService({
+  url: "http://localhost:3000",
+});
+
+app.use(middleware);
+
+app.get("/", (req, res) => {
+  res.json({ message: "Hello from Express" });
+});
+```
+
+---
+
+## ✨ Client-Side Usage
+
+You can use either the supercharged Axios client or the native Fetch wrapper.
+
+### ➤ Using Axios (Recommended)
+
+```ts
+import { ApiService } from "@alyvro/api-service";
+
 const api = new ApiService({
-  url: "https://alyvro.com",
-  settings: { telegram: true }, // enables Telegram error reporting
-  middleware: {
-    skip_routers: ["/health", "/status"],
+  url: "https://api.alyvro.com",
+});
+
+const response = await api.client.axios.request().post(
+  "/user",
+  { name: "John Doe" },
+  {
+    plugins: {
+      retry: { retries: 3 },
+      compressor: true,
+    },
+  },
+);
+```
+
+### ➤ Using Fetch
+
+```ts
+const response = await api.client.fetch.request("/user", {
+  method: "GET",
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+```
+
+---
+
+## 💎 Typed API (TypeScript Magic)
+
+Define your API schema once and get full auto-completion and type inference for every request.
+
+```ts
+import { ApiService } from "@alyvro/api-service";
+
+type ApiSchema = {
+  "/users": { id: number; name: string }[];
+  "/auth/login": { token: string };
+};
+
+const api = new ApiService({
+  url: "https://api.example.com",
+}).client.axios.request<ApiSchema>();
+
+// ✅ TypeScript knows this returns { token: string }
+api.post("/auth/login", { username: "admin" }).then((res) => {
+  console.log(res.data.token);
+});
+
+// ✅ TypeScript knows this returns Array<{ id: number; name: string }>
+api.get("/users").then((res) => {
+  console.log(res.data[0].name);
+});
+```
+
+---
+
+## 🧩 Plugins (Axios Only)
+
+Plugins allow extending the functionality of requests per call.
+
+| Plugin         | Description                                                  |
+| :------------- | :----------------------------------------------------------- |
+| **Retry**      | Automatically retries failed requests with backoff strategy. |
+| **Cache**      | Stores responses to prevent redundant network calls.         |
+| **Compressor** | Handles gzip compression/decompression automatically.        |
+| **Cancel**     | specific signal to abort requests.                           |
+
+**Example:**
+
+```ts
+import { createAbortController } from "@alyvro/api-service/plugins";
+
+const controller = createAbortController();
+
+api.client.axios.request().get("/large-data", {
+  signal: controller.signal,
+  plugins: {
+    retry: { retries: 5, retryDelay: 1000 },
+    cache: true,
   },
 });
 
-// Middleware with skip_routers option
-app.use((req, res, next) => api.server.middleware(req, res, next));
-
-app.get("/", (req, res) => {
-  res.json({ message: "Hello world!" });
-});
+// Cancel the request
+controller.abort();
 ```
-
-Middleware now supports skipping routes via `skip_routers`. Requests matching any path in this array will bypass the middleware.
-
-All server errors will automatically be sent to your Telegram bot.
 
 ---
 
-### Typed Axios Example
-
-With this setup, you can define a strongly-typed mapping of your API endpoints and their expected responses. This allows TypeScript to infer the correct response type automatically based on the URL you pass.
-
-#### Example
-
-```ts
-// Define your API schema mapping endpoints to their response types
-const apis = new ApiService({
-  url: "https://api.example.com",
-}).client.axios.request<{
-  "/": { index: number };
-  "/auth": { success: boolean };
-  "/profile": { id: string; name: string; email: string };
-}>();
-
-// GET request - TypeScript infers the response type as { index: number }
-apis.get("/").then((res) => {
-  console.log(res.data.index); // ✅ res.data.index is a number
-});
-
-// POST request - TypeScript infers the response type as { success: boolean }
-apis.post("/auth", { username: "john", password: "secret" }).then((res) => {
-  if (res.data.success) {
-    console.log("Login successful ✅");
-  }
-});
-
-// PATCH request - TypeScript infers the response type as { id: string; name: string; email: string }
-apis.patch("/profile", { name: "John Doe" }).then((res) => {
-  console.log(res.data.email); // ✅ res.data.email is a string
-});
-
-// DELETE request - also fully typed
-apis.delete("/profile").then((res) => {
-  console.log(res.data.id); // ✅ res.data.id is a string
-});
-```
-
-#### Benefits
-
-- **Type-safe endpoints**: Each endpoint URL is strongly typed, so you can’t accidentally mistype.
-- **Automatic inference**: No need to manually annotate response types, they are inferred from the schema.
-- **Better DX**: Autocomplete and IntelliSense show the correct response structure per endpoint.
-
-This pattern combines the flexibility of Axios with the type-safety of a predefined API schema.
-
----
-
-## ⚙️ Config Options
+## ⚙️ Configuration
 
 | Key                       | Type                                   | Required                                   | Description                                                    |
 | ------------------------- | -------------------------------------- | ------------------------------------------ | -------------------------------------------------------------- |
@@ -184,65 +204,23 @@ This pattern combines the flexibility of Axios with the type-safety of a predefi
 
 ---
 
-## 🧩 Plugins
+## 📫 Telegram Integration
 
-Plugins allow extending the functionality of requests and middleware. They are configured **per-request**.
+To enable error reporting:
 
-### Built-in Plugins
+1. Set `TELEGRAM_TOKEN` and `TELEGRAM_CHAT_ID` in your environment variables.
+2. Enable it in the config:
 
-- **Cache**
-  Stores last response and prevents duplicate requests with identical payloads.
+ts
+new ApiService({
+url: "...",
+setting: { telegram: true }
+});
 
-- **Compressor**
-  Compresses request payloads and automatically decompresses gzip responses.
-
-- **Retry**
-  Automatically retries failed requests.
-
-  ```ts
-  plugins: { retry: { retries: 5, retryDelay: 500, backoff: true } }
-  ```
-
-- **Cancel**
-  Allows canceling requests using `AbortController`.
-
-  ```ts
-  import { createAbortController } from "@alyvro/api-service/plugins";
-  const controller = createAbortController();
-  api.get("/users", { signal: controller.signal });
-  controller.abort();
-  ```
-
-> ⚠️ **Note:** Plugins currently only work with Axios. Fetch does **not** support Axios plugins yet.
+Any 500/403 errors on the server will now be sent to your Telegram chat instantly.
 
 ---
 
-## 📫 Telegram Error Reporting
+## License
 
-Errors can be automatically sent to Telegram. Just provide your bot token and chat ID in the config.
-
----
-
-## 📘 License
-
-MIT License
-
-Copyright (c) 2025 Alyvro
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+MIT © [Alyvro](https://github.com/Alyvro)

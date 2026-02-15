@@ -1,12 +1,11 @@
-import type { TelegramNetworkObjectType } from "@/types/telegram";
-import type { NextFunction, Request, Response } from "express";
-
+import { FastifyReply, FastifyRequest } from "fastify";
 import { TelegramNetwork } from "@/network/telegram";
 import { getConfigStorage } from "@/storage";
 import Encrypt from "@/utils/enc";
 import jwt from "jsonwebtoken";
 import { gunzipSync, gzipSync } from "zlib";
 import { ConfigType } from "main/types";
+import { TelegramNetworkObjectType } from "@/types/telegram";
 
 const { verify } = jwt;
 
@@ -34,8 +33,8 @@ const sendTelegramMessage = async (
 };
 
 const sendErrorMessage = async (
-  req: Request,
-  res: Response,
+  req: FastifyRequest,
+  reply: FastifyReply,
   config: ConfigType,
 ) => {
   const powered_by = config.middleware?.powered_by ?? "alyvro/api-service";
@@ -46,32 +45,28 @@ const sendErrorMessage = async (
         message:
           config.middleware?.errors?.forbidden ?? "no access to this api",
         method: req.method,
-        originalUrl: req.originalUrl,
+        originalUrl: req.url,
         status_code: "403",
       },
       config.logger,
     );
   }
 
-  res.status(403).json({
+  reply.status(403).send({
     message: config.middleware?.errors?.forbidden ?? "no access to this api",
     status: 403,
     powered_by,
   });
 };
 
-export async function middleware(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) {
+export async function middleware(req: FastifyRequest, reply: FastifyReply) {
   const config = getConfigStorage();
 
   if (
     config?.middleware?.skip_routers?.length &&
-    config.middleware.skip_routers.includes(req.path)
+    config.middleware.skip_routers.includes(req.routerPath)
   ) {
-    return next();
+    return;
   }
 
   if (!config) throw new Error("Config no install");
@@ -86,8 +81,7 @@ export async function middleware(
       req.headers[config.middleware?.headers?.status ?? "x-alyvro-status"];
 
     if (!alyvroStatus) {
-      sendErrorMessage(req, res, config);
-
+      await sendErrorMessage(req, reply, config);
       return;
     }
 
@@ -97,7 +91,7 @@ export async function middleware(
       req.headers[config.middleware?.headers?.bodyType ?? "x-alyvro-body-type"];
 
     if (!alyvroKey || typeof alyvroKey !== "string") {
-      sendErrorMessage(req, res, config);
+      await sendErrorMessage(req, reply, config);
       return;
     }
 
@@ -119,7 +113,7 @@ export async function middleware(
     }
 
     if (alyvroBodyType === "sec") {
-      let decode = decryptSecureBlob(req.body);
+      let decode = decryptSecureBlob(req.body as any);
 
       try {
         decode = JSON.parse(decode);
@@ -130,28 +124,35 @@ export async function middleware(
       req.body = bodyData;
     }
 
-    const originalJson = res.json.bind(res);
-    res.json = (data) => {
+    const originalSend = reply.send.bind(reply);
+
+    reply.send = function (payload: unknown) {
       if (req.headers["accept-encoding"]?.includes("gzip")) {
         try {
-          const compressed = gzipSync(
-            Buffer.from(JSON.stringify(data), "utf-8"),
-          );
-          res.setHeader("Content-Encoding", "gzip");
-          res.setHeader("Content-Type", "application/json");
-          res.send(compressed);
-          return res;
+          let bufferData: Buffer;
+
+          if (Buffer.isBuffer(payload)) {
+            bufferData = payload;
+          } else if (typeof payload === "string") {
+            bufferData = Buffer.from(payload, "utf-8");
+          } else {
+            bufferData = Buffer.from(JSON.stringify(payload), "utf-8");
+            reply.header("Content-Type", "application/json");
+          }
+
+          const compressed = gzipSync(bufferData);
+          reply.header("Content-Encoding", "gzip");
+          reply.removeHeader("Content-Length");
+
+          return originalSend(compressed);
         } catch (error) {
           console.error("Failed to compress response:", error);
         }
-
-        return originalJson();
       }
-    };
-
-    return next();
+      return originalSend(payload);
+    } as any;
   } catch {
-    sendErrorMessage(req, res, config);
+    await sendErrorMessage(req, reply, config);
     return;
   }
 }

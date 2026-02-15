@@ -1,4 +1,3 @@
-import type { Request, Response, NextFunction } from "express";
 import type { ConfigType } from "@/types/config";
 import type { AlyvroAxiosInstance, ApiResponseMapDefault } from "./api";
 
@@ -12,20 +11,12 @@ export abstract class ApiServiceType {
   abstract get client(): {
     axios: {
       request: <
-        M extends Record<string, any> = ApiResponseMapDefault
+        M extends Record<string, any> = ApiResponseMapDefault,
       >() => AlyvroAxiosInstance<M>;
     };
     fetch: {
       request: typeof import("@/client/fetcher").default;
     };
-  };
-
-  abstract get server(): {
-    middleware: (
-      req: Request,
-      res: Response,
-      next: NextFunction
-    ) => Promise<void>;
   };
 }
 
