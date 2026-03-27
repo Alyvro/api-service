@@ -7,7 +7,7 @@ const { sign } = jwt;
 
 export default async function fetcher<T = unknown>(
   input: string,
-  init?: RequestInitType | undefined
+  init?: RequestInitType | undefined,
 ) {
   const config = getConfigStorage();
 
@@ -24,22 +24,22 @@ export default async function fetcher<T = unknown>(
       config.middleware?.headers?.apiKey ?? "x-alyvro-api-key",
       sign({ data: "alyvro-secret-api-service" }, env?.PRIVATE_KEY!, {
         expiresIn: "10min",
-      })
+      }),
     );
     headers.set(
       config.middleware?.headers?.bodyType ?? "x-alyvro-body-type",
-      "none"
+      "none",
     );
     headers.set(
       config.middleware?.headers?.status ?? "x-alyvro-status",
-      String(init?.status ?? true)
+      String(init?.status ?? true),
     );
 
     if (auth?.username && auth?.password) {
       headers.set(
         "Authorization",
         "Basic " +
-          Buffer.from(`${auth.username}:${auth.password}`).toString("base64")
+          Buffer.from(`${auth.username}:${auth.password}`).toString("base64"),
       );
     }
 
@@ -96,4 +96,55 @@ export default async function fetcher<T = unknown>(
   }
 
   return fetch(finalUrl, finalInit);
+}
+
+export async function fetcherClient<T = unknown>(
+  input: string,
+  init?: RequestInitType | undefined,
+) {
+  const buildHeaders = (): Headers => {
+    const headers = new Headers(init?.headers);
+
+    if (init?.method === "POST") {
+      headers.set("Content-Type", "application/json");
+    }
+
+    return headers;
+  };
+
+  const finalInit: RequestInitType = {
+    ...init,
+    headers: buildHeaders(),
+    ...(init?.body
+      ? {
+          body:
+            typeof init.body === "string"
+              ? init.body
+              : JSON.stringify(init.body),
+        }
+      : undefined),
+  };
+
+  if (init?.response_return) {
+    const res = await fetch(input, finalInit);
+
+    if (!init.response_return_status_check && !res.ok) {
+      const data = await res.json();
+
+      throw new ApiError(res.status, res.statusText, data, init);
+    }
+
+    if (
+      init.response_return_status_check &&
+      init.response_return_status_check !== res.status
+    ) {
+      const data = await res.json();
+
+      throw new ApiError(res.status, res.statusText, data, init);
+    }
+
+    return (await res.json()) as T;
+  }
+
+  return fetch(input, finalInit);
 }

@@ -4,7 +4,7 @@ import type { RetryOptions } from "./retry";
 export {};
 
 declare global {
-  type ApiExteraConfigRequest = {
+  type ApiExtraConfigRequest = {
     secret?: Partial<{
       body: boolean;
     }>;

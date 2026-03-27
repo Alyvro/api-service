@@ -1,5 +1,9 @@
 import { retry } from "@/plugins/retry";
-import type { AlyvroAxiosInstance, ServiceSchema } from "@/types/api";
+import type {
+  AlyvroAxiosInstance,
+  ServiceSchema,
+  AlyvroInternalConfig,
+} from "@/types/api";
 import type { ConfigEnvType, ConfigMiddlewareType } from "@/types/config";
 import Encrypt from "@/utils/enc";
 import axios, { type AxiosBasicCredentials } from "axios";
@@ -20,8 +24,20 @@ export default function <S extends ServiceSchema = any>(
   }) as unknown as AlyvroAxiosInstance<S>;
 
   api.interceptors.request.use((config) => {
+    const customConfig = config as AlyvroInternalConfig;
+
+    if (customConfig.path && customConfig.url) {
+      Object.keys(customConfig.path).forEach((key) => {
+        customConfig.url = customConfig.url!.replace(
+          `:${key}`,
+          encodeURIComponent(String(customConfig.path![key])),
+        );
+      });
+      delete customConfig.path;
+    }
+
     const { encryptSecureBlob } = Encrypt(env);
-    const secret = (config as any).secret;
+    const secret = customConfig.secret;
 
     config.headers[config_middleware?.headers?.apiKey ?? "x-alyvro-api-key"] =
       sign({ data: "alyvro-secret-api-service" }, env?.PRIVATE_KEY!, {
@@ -33,9 +49,9 @@ export default function <S extends ServiceSchema = any>(
     ] = secret?.body ? "sec" : "none";
 
     config.headers[config_middleware?.headers?.status ?? "x-alyvro-status"] =
-      (config as any).status ?? true;
+      customConfig.status ?? true;
 
-    if ((config as any).plugins?.compressor && config?.data) {
+    if (customConfig.plugins?.compressor && config?.data) {
       const str = JSON.stringify(config.data);
       config.data = gzipSync(str);
       config.headers["Content-Encoding"] = "gzip";
