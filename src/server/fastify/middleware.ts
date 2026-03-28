@@ -1,8 +1,4 @@
-import type {
-  FastifyReply,
-  FastifyRequest,
-  HookHandlerDoneFunction,
-} from "fastify";
+import { FastifyReply, FastifyRequest, HookHandlerDoneFunction } from "fastify";
 import { TelegramNetwork } from "@/network/telegram";
 import { getConfigStorage } from "@/storage";
 import Encrypt from "@/utils/enc";
@@ -63,20 +59,16 @@ const sendErrorMessage = async (
   });
 };
 
-export async function middleware(
-  req: FastifyRequest,
-  reply: FastifyReply,
-  done: HookHandlerDoneFunction,
-) {
+export async function middleware(req: FastifyRequest, reply: FastifyReply) {
   const config = getConfigStorage();
 
   const path = req.raw.url?.split("?")[0];
 
   if (
     config?.middleware?.skip_routers?.length &&
-    config.middleware.skip_routers.includes(path!)
+    config.middleware.skip_routers.some((r) => path?.startsWith(r))
   ) {
-    return done();
+    return;
   }
 
   if (!config) throw new Error("Config no install");
@@ -97,6 +89,7 @@ export async function middleware(
 
     const alyvroKey =
       req.headers[config.middleware?.headers?.apiKey ?? "x-alyvro-api-key"];
+
     const alyvroBodyType =
       req.headers[config.middleware?.headers?.bodyType ?? "x-alyvro-body-type"];
 
@@ -115,11 +108,7 @@ export async function middleware(
       req.headers["content-encoding"] === "gzip" &&
       Buffer.isBuffer(bodyData)
     ) {
-      try {
-        bodyData = gunzipSync(bodyData).toString("utf-8");
-      } catch (err) {
-        console.error("Failed to decompress gzip body:", err);
-      }
+      bodyData = gunzipSync(bodyData).toString("utf-8");
     }
 
     if (alyvroBodyType === "sec") {
@@ -127,7 +116,7 @@ export async function middleware(
 
       try {
         decode = JSON.parse(decode);
-      } catch (error) {}
+      } catch {}
 
       req.body = decode;
     } else {
@@ -141,28 +130,23 @@ export async function middleware(
         try {
           let bufferData: Buffer;
 
-          if (Buffer.isBuffer(payload)) {
-            bufferData = payload;
-          } else if (typeof payload === "string") {
+          if (Buffer.isBuffer(payload)) bufferData = payload;
+          else if (typeof payload === "string")
             bufferData = Buffer.from(payload, "utf-8");
-          } else {
-            bufferData = Buffer.from(JSON.stringify(payload), "utf-8");
-            reply.header("Content-Type", "application/json");
-          }
+          else bufferData = Buffer.from(JSON.stringify(payload), "utf-8");
 
           const compressed = gzipSync(bufferData);
+
           reply.header("Content-Encoding", "gzip");
           reply.removeHeader("Content-Length");
 
           return originalSend(compressed);
-        } catch (error) {
-          console.error("Failed to compress response:", error);
-        }
+        } catch {}
       }
+
       return originalSend(payload);
     } as any;
   } catch {
     await sendErrorMessage(req, reply, config);
-    return;
   }
 }
