@@ -1,4 +1,8 @@
-import { FastifyReply, FastifyRequest } from "fastify";
+import type {
+  FastifyReply,
+  FastifyRequest,
+  HookHandlerDoneFunction,
+} from "fastify";
 import { TelegramNetwork } from "@/network/telegram";
 import { getConfigStorage } from "@/storage";
 import Encrypt from "@/utils/enc";
@@ -59,7 +63,11 @@ const sendErrorMessage = async (
   });
 };
 
-export async function middleware(req: FastifyRequest, reply: FastifyReply) {
+export async function middleware(
+  req: FastifyRequest,
+  reply: FastifyReply,
+  done: HookHandlerDoneFunction,
+) {
   const config = getConfigStorage();
 
   const path = req.raw.url?.split("?")[0];
@@ -68,7 +76,7 @@ export async function middleware(req: FastifyRequest, reply: FastifyReply) {
     config?.middleware?.skip_routers?.length &&
     config.middleware.skip_routers.includes(path!)
   ) {
-    return;
+    return done();
   }
 
   if (!config) throw new Error("Config no install");
