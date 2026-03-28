@@ -62,9 +62,11 @@ const sendErrorMessage = async (
 export async function middleware(req: FastifyRequest, reply: FastifyReply) {
   const config = getConfigStorage();
 
+  const path = req.raw.url?.split("?")[0];
+
   if (
     config?.middleware?.skip_routers?.length &&
-    config.middleware.skip_routers.includes(req.routerPath)
+    config.middleware.skip_routers.includes(path!)
   ) {
     return;
   }
